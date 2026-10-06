@@ -1,67 +1,270 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101827"><title>PANLOGISTICS | Diligencias compartidas</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>PANLOGISTICS | Control de Diligencias</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--navy:#101827;--navy2:#1b2940;--gold:#d7b56d;--bg:#f3f5f8;--ink:#172033;--muted:#687386;--line:#dfe4ec;--green:#16794b;--red:#b42318}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:white;padding:20px 15px;border-bottom:4px solid var(--gold)}.head,main{max-width:960px;margin:auto}.company{font-size:12px;letter-spacing:1.5px;color:var(--gold);font-weight:800}h1{font-size:22px;margin:4px 0}header p{margin:0;color:#d9dfeb;font-size:13px}
-main{padding:15px 12px 40px}.notice{font-size:12px;color:#5d4a20;background:#fff6dc;border:1px solid #f0dfab;padding:10px 12px;border-radius:10px;margin-bottom:13px}
-.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:13px;box-shadow:0 2px 8px #15223808}.panel h2{font-size:17px;margin:0 0 13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{min-width:0}.full{grid-column:1/-1}label{display:block;font-size:12px;font-weight:750;color:#4c586b;margin-bottom:5px}input,select,textarea{font:inherit;width:100%;min-height:44px;border:1px solid #cfd6e1;border-radius:9px;padding:10px;background:white;color:var(--ink)}textarea{min-height:72px}.btn{border:0;border-radius:10px;padding:12px 14px;font:700 14px system-ui;cursor:pointer;min-height:44px}.primary{background:var(--navy);color:white}.gold{background:var(--gold);color:#201b10}.secondary{background:#edf1f6;color:var(--navy)}.danger{background:#fff0ef;color:var(--red)}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions .btn{flex:1}.hint{font-size:12px;color:var(--muted)}.tabs{display:flex;gap:7px;margin-bottom:13px}.tab{flex:1;border:1px solid var(--line);background:white;border-radius:10px;padding:10px 5px;font-weight:700;color:var(--navy)}.tab.active{background:var(--navy);color:white}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stat{background:white;border:1px solid var(--line);border-radius:11px;padding:11px}.stat span{display:block;font-size:11px;color:var(--muted)}.stat strong{font-size:19px}.entry{border:1px solid var(--line);border-radius:11px;padding:12px;margin-top:9px}.entry h3{font-size:15px;margin:0}.entry p{font-size:12px;color:var(--muted);margin:4px 0}.entrytop{display:flex;justify-content:space-between;gap:8px}.pill{font-size:11px;font-weight:800;background:#e8f5ee;color:var(--green);border-radius:20px;padding:4px 8px;height:max-content}.pending{background:#fff3d7;color:#8b5b00}.entrybuttons{display:flex;gap:7px;margin-top:9px}.entrybuttons button{flex:1}.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px}.status{font-size:12px;padding:8px 10px;border-radius:8px;margin-bottom:10px;background:#edf1f6}.status.error{background:#fff0ef;color:var(--red)}.status.ok{background:#e8f5ee;color:var(--green)}.empty{text-align:center;padding:22px;color:var(--muted);font-size:14px}[hidden]{display:none!important}
-@media(min-width:680px){main{padding:20px}.entrylist{display:grid;grid-template-columns:1fr 1fr;gap:9px}.entrylist .entry{margin-top:0}.panel{padding:20px}}@media(max-width:390px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.stats strong{font-size:16px}.tab{font-size:12px}}
-</style></head>
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:white;padding:24px 15px;border-bottom:4px solid var(--gold)}
+.head,main{max-width:960px;margin:auto}
+.company{font-size:12px;letter-spacing:1.7px;color:var(--gold);font-weight:800}
+h1{font-size:24px;margin:5px 0 2px}
+header p{margin:0;color:#d9dfeb;font-size:13px}
+main{padding:18px 12px 40px}
+.notice{font-size:12px;color:#5d4a20;background:#fff6dc;border:1px solid #f0dfab;padding:10px 12px;border-radius:10px;margin-bottom:13px}
+.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:13px;box-shadow:0 2px 8px #15223808}
+.panel h2{font-size:17px;margin:0 0 13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.field{min-width:0}.full{grid-column:1/-1}
+label{display:block;font-size:12px;font-weight:750;color:#4c586b;margin-bottom:5px}
+input,select,textarea{font:inherit;width:100%;min-height:44px;border:1px solid #cfd6e1;border-radius:9px;padding:10px;background:white;color:var(--ink)}
+textarea{min-height:72px}
+.btn{border:0;border-radius:10px;padding:12px 14px;font:700 14px system-ui;cursor:pointer;min-height:44px}
+.primary{background:var(--navy);color:white}.gold{background:var(--gold);color:#201b10}.secondary{background:#edf1f6;color:var(--navy)}.danger{background:#fff0ef;color:var(--red)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions .btn{flex:1}
+.hint{font-size:12px;color:var(--muted)}
+.status{font-size:12px;padding:8px 10px;border-radius:8px;margin-bottom:10px;background:#edf1f6}
+.status.error{background:#fff0ef;color:var(--red)}.status.ok{background:#e8f5ee;color:var(--green)}
+.login-wrap{max-width:430px;margin:7vh auto 0}
+.login-card{padding:28px 24px}
+.login-title{text-align:center;margin-bottom:22px}
+.login-title .mark{width:58px;height:58px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;color:var(--gold);font-weight:900;letter-spacing:1px}
+.login-title h2{font-size:22px;margin:0 0 4px}.login-title p{font-size:13px;color:var(--muted);margin:0}
+.login-footer{text-align:center;color:var(--muted);font-size:11px;margin-top:16px}
+.tabs{display:flex;gap:7px;margin-bottom:13px}.tab{flex:1;border:1px solid var(--line);background:white;border-radius:10px;padding:10px 5px;font-weight:700;color:var(--navy)}.tab.active{background:var(--navy);color:white}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stat{background:white;border:1px solid var(--line);border-radius:11px;padding:11px}.stat span{display:block;font-size:11px;color:var(--muted)}.stat strong{font-size:19px}
+.entry{border:1px solid var(--line);border-radius:11px;padding:12px;margin-top:9px}.entry h3{font-size:15px;margin:0}.entry p{font-size:12px;color:var(--muted);margin:4px 0}
+.entrytop{display:flex;justify-content:space-between;gap:8px}.pill{font-size:11px;font-weight:800;background:#e8f5ee;color:var(--green);border-radius:20px;padding:4px 8px;height:max-content}.pending{background:#fff3d7;color:#8b5b00}
+.entrybuttons{display:flex;gap:7px;margin-top:9px}.entrybuttons button{flex:1}.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.empty{text-align:center;padding:22px;color:var(--muted);font-size:14px}[hidden]{display:none!important}
+@media(min-width:680px){main{padding:20px}.entrylist{display:grid;grid-template-columns:1fr 1fr;gap:9px}.entrylist .entry{margin-top:0}.panel{padding:20px}}
+@media(max-width:390px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.stats strong{font-size:16px}.tab{font-size:12px}}
+</style>
+</head>
 <body>
-<header><div class="head"><div class="company">PANLOGISTICS GROUP, S.A.</div><h1>Control compartido de diligencias</h1><p>Registro móvil · Acceso desde celular y computadora</p></div></header>
+<header>
+  <div class="head">
+    <div class="company">PANLOGISTICS GROUP, S.A.</div>
+    <h1>Control de Diligencias</h1>
+    <p>Registro operativo · Acceso autorizado desde celular y computadora</p>
+  </div>
+</header>
+
 <main>
-<div id="status" class="status">Configura la conexión a la base de datos para comenzar.</div>
-<section id="setup" class="panel"><h2>1. Conectar la base de datos</h2><p class="hint">Pega la URL del proyecto Supabase y la clave pública anon/publishable. Se guardan en este navegador. No introduzcas la service_role key.</p><div class="grid"><div class="field full"><label>Project URL</label><input id="sbUrl" placeholder="https://xxxxxxxx.supabase.co"></div><div class="field full"><label>Publishable / anon key</label><textarea id="sbKey" placeholder="Clave pública del proyecto" style="min-height:65px"></textarea></div></div><div class="actions"><button id="connect" class="btn primary">Conectar</button><button id="disconnect" class="btn secondary">Desconectar</button></div><p class="hint">Consulta INSTRUCCIONES.txt y schema.sql incluidos en el paquete para crear el proyecto y configurar permisos.</p></section>
-<section id="auth" class="panel" hidden><h2>2. Iniciar sesión</h2><p class="hint">Cada mensajero o supervisor debe tener una cuenta autorizada.</p><div class="grid"><div class="field"><label>Correo electrónico</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label>Contraseña</label><input id="password" type="password" autocomplete="current-password" required></div></div><div class="actions"><button id="login" class="btn primary">Iniciar sesión</button><button id="signup" class="btn secondary">Crear cuenta</button><button id="logout" class="btn danger" hidden>Cerrar sesión</button></div></section>
-<div id="app" hidden>
-<div class="notice">Los registros se guardan en una base de datos compartida y se consultan desde los dispositivos autorizados. Se requiere internet para guardar o actualizar.</div>
-<div class="tabs"><button class="tab active" data-tab="formView">＋ Registrar</button><button class="tab" data-tab="listView">☷ Historial</button><button class="tab" data-tab="exportView">⇧ Exportar</button></div>
-<section id="formView"><div class="panel"><h2 id="formTitle">Nueva diligencia</h2><form id="entryForm"><input id="entryId" type="hidden"><div class="grid">
-<div class="field"><label>Fecha *</label><input id="date" type="date" required></div><div class="field"><label>Mensajero *</label><input id="colaborador" required value="Jhonatan Valencia"></div>
-<div class="field"><label>Departamento</label><input id="departamento" value="Mensajería"></div><div class="field"><label>Cargo</label><input id="cargo" value="Mensajero"></div>
-<div class="field full"><label>Destino / cliente *</label><input id="destino" required placeholder="Cliente o institución"></div>
-<div class="field full"><label>Motivo *</label><select id="motivo" required><option value="">Seleccionar…</option><option>Mensajería</option><option>Entrega de documentos</option><option>Entrega de formularios</option><option>Paquetería</option><option>Retiro</option><option>Retiro de carga</option><option>Trámites</option><option>Compras</option><option>Otro</option></select></div>
-<div class="field"><label>Hora de salida *</label><input id="salida" type="time" required></div><div class="field"><label>Hora de regreso *</label><input id="regreso" type="time" required></div>
-<div class="field"><label>Sobre / efectivo (B/.)</label><input id="sobre" type="number" min="0" step=".01" value="0"></div><div class="field"><label>Viático (B/.)</label><input id="viatico" type="number" min="0" step=".01" value="0"></div>
-<div class="field"><label>Código / referencia</label><input id="codigo"></div><div class="field"><label>Supervisor</label><input id="supervisor" value="Richard Albornoz"></div>
-<div class="field full"><label>Observaciones / resultado</label><textarea id="obs" placeholder="Resultado de la diligencia…"></textarea></div></div><p class="hint">La duración se calcula automáticamente. Si termina después de medianoche, se contempla el cambio de día.</p><div class="actions"><button class="btn primary" type="submit">Guardar en sistema</button><button class="btn secondary" type="button" id="clear">Limpiar</button></div></form></div></section>
-<section id="listView" hidden><div class="stats"><div class="stat"><span>Diligencias</span><strong id="count">0</strong></div><div class="stat"><span>Horas</span><strong id="hours">0.00</strong></div><div class="stat"><span>Viáticos B/.</span><strong id="allowance">0.00</strong></div></div><div class="panel"><h2>Historial compartido</h2><div class="toolbar"><div><label>Mes</label><input id="filterMonth" type="month"></div><div><label>Mensajero</label><input id="filterName" placeholder="Todos"></div></div><div id="entries" class="entrylist"></div><div class="actions"><button class="btn secondary" id="refresh">Actualizar historial</button></div></div></section>
-<section id="exportView" hidden><div class="panel"><h2>Exportar registros</h2><p class="hint">Exporta los registros visibles según el filtro del historial o todos los registros de la base de datos.</p><div class="actions"><button class="btn primary" id="exportJson">Descargar JSON</button><button class="btn secondary" id="exportCsv">Descargar CSV para Excel</button></div></div><div class="panel"><h2>Importar respaldo JSON</h2><p class="hint">Combina registros de un respaldo previo. Los registros con el mismo ID se omiten para evitar duplicados.</p><input id="importFile" type="file" accept=".json,application/json"><div class="actions"><button class="btn gold" id="importBtn">Importar a la base compartida</button></div></div></section>
-</div></main>
+  <div id="status" class="status" hidden></div>
+
+  <section id="auth" class="login-wrap">
+    <div class="panel login-card">
+      <div class="login-title">
+        <div class="mark">PL</div>
+        <h2>Acceso al sistema</h2>
+        <p>Ingrese con sus credenciales autorizadas</p>
+      </div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input id="email" type="email" autocomplete="username" placeholder="usuario@empresa.com" required>
+      </div>
+      <div class="field" style="margin-top:11px">
+        <label>Contraseña</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      </div>
+      <div class="actions">
+        <button id="login" class="btn primary">Iniciar sesión</button>
+      </div>
+      <div class="actions">
+        <button id="forgot" class="btn secondary" type="button">¿Olvidó su contraseña?</button>
+      </div>
+      <div class="login-footer">Sistema interno · PANLOGISTICS GROUP, S.A.</div>
+    </div>
+  </section>
+
+  <section id="app" hidden>
+    <div class="notice">Los registros se guardan en una base de datos compartida y se consultan desde los dispositivos autorizados. Se requiere internet para guardar o actualizar.</div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="formView">＋ Registrar</button>
+      <button class="tab" data-tab="listView">☷ Historial</button>
+      <button class="tab" data-tab="exportView">⇧ Exportar</button>
+    </div>
+
+    <section id="formView">
+      <div class="panel">
+        <h2 id="formTitle">Nueva diligencia</h2>
+        <form id="entryForm">
+          <input id="entryId" type="hidden">
+          <div class="grid">
+            <div class="field"><label>Fecha *</label><input id="date" type="date" required></div>
+            <div class="field"><label>Mensajero *</label><input id="colaborador" required></div>
+            <div class="field"><label>Departamento</label><input id="departamento" value="Mensajería"></div>
+            <div class="field"><label>Cargo</label><input id="cargo" value="Mensajero"></div>
+            <div class="field full"><label>Destino / cliente *</label><input id="destino" required placeholder="Cliente o institución"></div>
+            <div class="field full"><label>Motivo *</label><select id="motivo" required><option value="">Seleccionar…</option><option>Mensajería</option><option>Entrega de documentos</option><option>Entrega de formularios</option><option>Paquetería</option><option>Retiro</option><option>Retiro de carga</option><option>Trámites</option><option>Compras</option><option>Otro</option></select></div>
+            <div class="field"><label>Hora de salida *</label><input id="salida" type="time" required></div>
+            <div class="field"><label>Hora de regreso *</label><input id="regreso" type="time" required></div>
+            <div class="field"><label>Sobre / efectivo (B/.)</label><input id="sobre" type="number" min="0" step=".01" value="0"></div>
+            <div class="field"><label>Viático (B/.)</label><input id="viatico" type="number" min="0" step=".01" value="0"></div>
+            <div class="field"><label>Código / referencia</label><input id="codigo"></div>
+            <div class="field"><label>Supervisor</label><input id="supervisor"></div>
+            <div class="field full"><label>Observaciones / resultado</label><textarea id="obs" placeholder="Resultado de la diligencia…"></textarea></div>
+          </div>
+          <p class="hint">La duración se calcula automáticamente. Si termina después de medianoche, se contempla el cambio de día.</p>
+          <div class="actions"><button class="btn primary" type="submit">Guardar en sistema</button><button class="btn secondary" type="button" id="clear">Limpiar</button><button class="btn danger" type="button" id="logout">Cerrar sesión</button></div>
+        </form>
+      </div>
+    </section>
+
+    <section id="listView" hidden>
+      <div class="stats"><div class="stat"><span>Diligencias</span><strong id="count">0</strong></div><div class="stat"><span>Horas</span><strong id="hours">0.00</strong></div><div class="stat"><span>Viáticos B/.</span><strong id="allowance">0.00</strong></div></div>
+      <div class="panel">
+        <h2>Historial compartido</h2>
+        <div class="toolbar"><div><label>Mes</label><input id="filterMonth" type="month"></div><div><label>Mensajero</label><input id="filterName" placeholder="Todos"></div></div>
+        <div id="entries" class="entrylist"></div>
+        <div class="actions"><button class="btn secondary" id="refresh">Actualizar historial</button></div>
+      </div>
+    </section>
+
+    <section id="exportView" hidden>
+      <div class="panel"><h2>Exportar registros</h2><p class="hint">Exporta los registros visibles según el filtro del historial.</p><div class="actions"><button class="btn primary" id="exportJson">Descargar JSON</button><button class="btn secondary" id="exportCsv">Descargar CSV para Excel</button></div></div>
+      <div class="panel"><h2>Importar respaldo JSON</h2><p class="hint">Combina registros de un respaldo previo. Los registros existentes pueden omitirse.</p><input id="importFile" type="file" accept=".json,application/json"><div class="actions"><button class="btn gold" id="importBtn">Importar respaldo</button></div></div>
+    </section>
+  </section>
+</main>
+
 <script>
-const $=id=>document.getElementById(id);let sb=null,user=null,editing=null,records=[];
+const SUPABASE_URL='https://stujfwqzbtbqfapmvpog.supabase.co';
+const SUPABASE_KEY='sb_publishable_RtUb5ukwLAWBKIwuGi09RQ_4lj3zscv';
+
+const $=id=>document.getElementById(id);
+let sb=null,user=null,editing=null,records=[];
 const fields=['date','colaborador','departamento','cargo','destino','motivo','salida','regreso','sobre','viatico','codigo','supervisor','obs'];
-function msg(t,type=''){const el=$('status');el.textContent=t;el.className='status '+type}
+
+function msg(t,type=''){const el=$('status');el.hidden=false;el.textContent=t;el.className='status '+type}
 function today(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function dur(a,b){if(!a||!b)return 0;let [h,m]=a.split(':').map(Number),[x,y]=b.split(':').map(Number),n=x*60+y-h*60-m;if(n<0)n+=1440;return n/60}
 function money(n){return (Number(n)||0).toLocaleString('es-PA',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function tab(id){['formView','listView','exportView'].forEach(x=>$(x).hidden=x!==id);document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));if(id==='listView')loadRecords()}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
-function connect(){const url=$('sbUrl').value.trim(),key=$('sbKey').value.trim();if(!url||!key){msg('Ingresa la URL y la clave pública de Supabase.','error');return}try{localStorage.setItem('pl_sb_url',url);localStorage.setItem('pl_sb_key',key);sb=window.supabase.createClient(url,key);$('auth').hidden=false;msg('Conexión configurada. Inicia sesión.','ok');checkSession()}catch(e){msg('No se pudo configurar la conexión: '+e.message,'error')}}
-$('connect').onclick=connect;$('disconnect').onclick=()=>{localStorage.removeItem('pl_sb_url');localStorage.removeItem('pl_sb_key');sb=null;$('auth').hidden=true;$('app').hidden=true;msg('Conexión desconectada.')}
-async function checkSession(){if(!sb)return;const {data,error}=await sb.auth.getSession();if(error){msg(error.message,'error');return}if(data.session){user=data.session.user;showApp()}else{$('auth').hidden=false;$('app').hidden=true}}
-function showApp(){$('auth').hidden=false;$('logout').hidden=false;$('login').hidden=true;$('signup').hidden=true;$('app').hidden=false;msg('Sesión iniciada: '+user.email,'ok');resetForm();loadRecords()}
-$('login').onclick=async()=>{if(!sb)return msg('Conecta Supabase primero.','error');const {data,error}=await sb.auth.signInWithPassword({email:$('email').value,password:$('password').value});if(error)return msg(error.message,'error');user=data.user;showApp()}
-$('signup').onclick=async()=>{if(!sb)return msg('Conecta Supabase primero.','error');const {error}=await sb.auth.signUp({email:$('email').value,password:$('password').value});if(error)return msg(error.message,'error');msg('Solicitud de cuenta enviada. Si la confirmación por correo está activa, revisa tu email.','ok')}
-$('logout').onclick=async()=>{await sb.auth.signOut();user=null;$('app').hidden=true;$('login').hidden=false;$('signup').hidden=false;$('logout').hidden=true;msg('Sesión cerrada.')}
-function resetForm(){$('entryForm').reset();$('entryId').value='';editing=null;$('date').value=today();$('colaborador').value='Jhonatan Valencia';$('departamento').value='Mensajería';$('cargo').value='Mensajero';$('supervisor').value='Richard Albornoz';$('sobre').value='0';$('viatico').value='0';$('formTitle').textContent='Nueva diligencia'}
+
+function resetForm(){
+  $('entryForm').reset();$('entryId').value='';editing=null;$('date').value=today();
+  $('departamento').value='Mensajería';$('cargo').value='Mensajero';$('sobre').value='0';$('viatico').value='0';
+  $('formTitle').textContent='Nueva diligencia';
+}
 $('clear').onclick=resetForm;
-$('entryForm').onsubmit=async e=>{e.preventDefault();if(!sb||!user)return msg('Inicia sesión antes de guardar.','error');let d=$('date').value;let row={date:d,month:d.slice(0,7),q:Math.ceil(Number(d.slice(8,10))/15),colaborador:$('colaborador').value.trim(),departamento:$('departamento').value.trim(),cargo:$('cargo').value.trim(),destino:$('destino').value.trim(),motivo:$('motivo').value,salida:$('salida').value,regreso:$('regreso').value,hours:Number(dur($('salida').value,$('regreso').value).toFixed(2)),sobre:Number($('sobre').value)||0,viatico:Number($('viatico').value)||0,codigo:$('codigo').value.trim(),supervisor:$('supervisor').value.trim(),obs:$('obs').value.trim(),aprob:'Pendiente',created_by:user.id};let q=editing?sb.from('diligencias').update(row).eq('id',editing):sb.from('diligencias').insert(row);let {error}=await q;if(error)return msg('No se pudo guardar: '+error.message,'error');msg('Diligencia guardada en la base compartida.','ok');resetForm();tab('listView')};
-async function loadRecords(){if(!sb||!user)return;msg('Consultando registros…');let {data,error}=await sb.from('diligencias').select('*').order('date',{ascending:false}).limit(2000);if(error){msg('Error al consultar: '+error.message,'error');return}records=data||[];render();msg(`Historial actualizado (${records.length} registros consultados).`,'ok')}
-function filtered(){let m=$('filterMonth').value,n=$('filterName').value.trim().toLowerCase();return records.filter(x=>(!m||x.month===m)&&(!n||(x.colaborador||'').toLowerCase().includes(n)))}
-function render(){let rows=filtered();$('count').textContent=rows.length;$('hours').textContent=rows.reduce((s,x)=>s+Number(x.hours||0),0).toFixed(2);$('allowance').textContent=money(rows.reduce((s,x)=>s+Number(x.viatico||0),0));$('entries').innerHTML=rows.length?rows.map(x=>`<article class="entry"><div class="entrytop"><div><h3>${esc(x.destino)}</h3><p>${esc(x.date)} · ${esc(x.motivo)}</p></div><span class="pill ${x.aprob==='Pendiente'?'pending':''}">${esc(x.aprob||'Pendiente')}</span></div><p>${esc(x.colaborador)} · ${esc(x.salida)}–${esc(x.regreso)} · ${Number(x.hours||0).toFixed(2)} h</p><p>Viático B/. ${money(x.viatico)} · Sobre B/. ${money(x.sobre)}</p>${x.obs?`<p>${esc(x.obs)}</p>`:''}<div class="entrybuttons"><button class="btn secondary" onclick="edit('${x.id}')">Editar</button><button class="btn danger" onclick="del('${x.id}')">Eliminar</button></div></article>`).join(''):'<div class="empty">No hay registros para este filtro.</div>'}
-$('filterMonth').value=today().slice(0,7);$('filterMonth').onchange=render;$('filterName').oninput=render;$('refresh').onclick=loadRecords;
-window.edit=async id=>{let x=records.find(r=>String(r.id)===String(id));if(!x)return;editing=x.id;$('entryId').value=x.id;fields.forEach(k=>$(k).value=x[k]??'');$('formTitle').textContent='Editar diligencia';tab('formView');window.scrollTo({top:0,behavior:'smooth'})};
-window.del=async id=>{if(!confirm('¿Eliminar esta diligencia de la base compartida?'))return;let {error}=await sb.from('diligencias').delete().eq('id',id);if(error)msg('No se pudo eliminar: '+error.message,'error');else{msg('Diligencia eliminada.','ok');loadRecords()}};
+
+async function checkSession(){
+  const {data,error}=await sb.auth.getSession();
+  if(error)return msg(error.message,'error');
+  if(data.session){user=data.session.user;showApp()}
+}
+function showApp(){
+  $('auth').hidden=true;$('app').hidden=false;msg('Sesión iniciada correctamente.','ok');resetForm();loadRecords();
+}
+async function doLogin(){
+  const email=$('email').value.trim(),password=$('password').value;
+  if(!email||!password)return msg('Ingrese su correo y contraseña.','error');
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error)return msg('No fue posible iniciar sesión: '+error.message,'error');
+  user=data.user;showApp();
+}
+$('login').onclick=doLogin;
+$('password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+$('forgot').onclick=async()=>{
+  const email=$('email').value.trim();
+  if(!email)return msg('Ingrese primero su correo electrónico.','error');
+  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin});
+  if(error)return msg('No se pudo enviar el enlace: '+error.message,'error');
+  msg('Si el correo está autorizado, recibirá instrucciones para restablecer su contraseña.','ok');
+};
+
+$('logout').onclick=async()=>{
+  await sb.auth.signOut();user=null;records=[];$('app').hidden=true;$('auth').hidden=false;
+  $('password').value='';msg('Sesión cerrada.','ok');
+};
+
+$('entryForm').onsubmit=async e=>{
+  e.preventDefault();
+  if(!sb||!user)return msg('Inicie sesión antes de guardar.','error');
+  let d=$('date').value;
+  let row={
+    date:d,month:d.slice(0,7),q:Math.ceil(Number(d.slice(8,10))/15),
+    colaborador:$('colaborador').value.trim(),departamento:$('departamento').value.trim(),cargo:$('cargo').value.trim(),
+    destino:$('destino').value.trim(),motivo:$('motivo').value,salida:$('salida').value,regreso:$('regreso').value,
+    hours:Number(dur($('salida').value,$('regreso').value).toFixed(2)),sobre:Number($('sobre').value)||0,
+    viatico:Number($('viatico').value)||0,codigo:$('codigo').value.trim(),supervisor:$('supervisor').value.trim(),
+    obs:$('obs').value.trim(),aprob:'Pendiente',created_by:user.id
+  };
+  let q=editing?sb.from('diligencias').update(row).eq('id',editing):sb.from('diligencias').insert(row);
+  let {error}=await q;
+  if(error)return msg('No se pudo guardar: '+error.message,'error');
+  msg(editing?'Diligencia actualizada.':'Diligencia guardada en el sistema.','ok');resetForm();tab('listView');
+};
+
+async function loadRecords(){
+  if(!sb||!user)return;
+  let {data,error}=await sb.from('diligencias').select('*').order('date',{ascending:false}).limit(2000);
+  if(error){msg('Error al consultar: '+error.message,'error');return}
+  records=data||[];render();msg(`Historial actualizado (${records.length} registros).`,'ok');
+}
+function filtered(){
+  let m=$('filterMonth').value,n=$('filterName').value.trim().toLowerCase();
+  return records.filter(x=>(!m||x.month===m)&&(!n||(x.colaborador||'').toLowerCase().includes(n)));
+}
+function render(){
+  let rows=filtered();
+  $('count').textContent=rows.length;
+  $('hours').textContent=rows.reduce((s,x)=>s+Number(x.hours||0),0).toFixed(2);
+  $('allowance').textContent=money(rows.reduce((s,x)=>s+Number(x.viatico||0),0));
+  $('entries').innerHTML=rows.length?rows.map(x=>`<article class="entry">
+    <div class="entrytop"><div><h3>${esc(x.destino)}</h3><p>${esc(x.date)} · ${esc(x.motivo)}</p></div>
+    <span class="pill ${x.aprob==='Pendiente'?'pending':''}">${esc(x.aprob||'Pendiente')}</span></div>
+    <p>${esc(x.colaborador)} · ${esc(x.salida)}–${esc(x.regreso)} · ${Number(x.hours||0).toFixed(2)} h</p>
+    <p>Viático B/. ${money(x.viatico)} · Sobre B/. ${money(x.sobre)}</p>
+    ${x.obs?`<p>${esc(x.obs)}</p>`:''}
+    <div class="entrybuttons"><button class="btn secondary" onclick="edit('${x.id}')">Editar</button></div>
+  </article>`).join(''):'<div class="empty">No hay registros para este filtro.</div>';
+}
+$('filterMonth').value=today().slice(0,7);
+$('filterMonth').onchange=render;$('filterName').oninput=render;$('refresh').onclick=loadRecords;
+
+window.edit=async id=>{
+  let x=records.find(r=>String(r.id)===String(id));if(!x)return;
+  editing=x.id;$('entryId').value=x.id;fields.forEach(k=>$(k).value=x[k]??'');
+  $('formTitle').textContent='Editar diligencia';tab('formView');window.scrollTo({top:0,behavior:'smooth'});
+};
+
 function download(s,type,name){let a=document.createElement('a'),u=URL.createObjectURL(new Blob([s],{type}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
-$('exportJson').onclick=()=>{let data=filtered();download(JSON.stringify({version:3,exportedAt:new Date().toISOString(),data:{entries:data,evaluations:[],reportSettings:{empresa:'PANLOGISTICS GROUP, S.A.'}}},null,2),'application/json',`Panlogistics_Diligencias_${today()}.json`)};
+$('exportJson').onclick=()=>{let data=filtered();download(JSON.stringify({version:4,exportedAt:new Date().toISOString(),data:{entries:data,evaluations:[],reportSettings:{empresa:'PANLOGISTICS GROUP, S.A.'}}},null,2),'application/json',`Panlogistics_Diligencias_${today()}.json`)};
 $('exportCsv').onclick=()=>{let cols=['date','colaborador','departamento','cargo','destino','motivo','salida','regreso','hours','sobre','viatico','codigo','supervisor','obs','aprob'];download('\ufeff'+[cols.join(';'),...filtered().map(x=>cols.map(k=>'"'+String(x[k]??'').replace(/"/g,'""')+'"').join(';'))].join('\r\n'),'text/csv;charset=utf-8',`Panlogistics_Diligencias_${today()}.csv`)};
-$('importBtn').onclick=async()=>{let f=$('importFile').files[0];if(!f)return msg('Selecciona un archivo JSON.','error');try{let j=JSON.parse(await f.text()),arr=Array.isArray(j)?j:(j.data?.entries||j.entries);if(!Array.isArray(arr))throw Error('El JSON no contiene diligencias.');let added=0;for(let x of arr){let row={date:x.date,month:x.month||x.date?.slice(0,7),q:x.q||Math.ceil(Number(x.date?.slice(8,10))/15),colaborador:x.colaborador||'',departamento:x.departamento||'Mensajería',cargo:x.cargo||'Mensajero',destino:x.destino||'',motivo:x.motivo||'',salida:x.salida||'',regreso:x.regreso||'',hours:Number(x.hours)||0,sobre:Number(x.sobre)||0,viatico:Number(x.viatico)||0,codigo:x.codigo||'',supervisor:x.supervisor||'',obs:x.obs||'',aprob:x.aprob||'Pendiente',created_by:user.id};let {error}=await sb.from('diligencias').upsert(row,{onConflict:'date,destino,salida,colaborador',ignoreDuplicates:true});if(error)throw error;added++}msg(`Importación procesada: ${added} registros enviados (posibles duplicados omitidos).`,'ok');loadRecords()}catch(e){msg('Error de importación: '+e.message,'error')}};
-const savedUrl=localStorage.getItem('pl_sb_url'),savedKey=localStorage.getItem('pl_sb_key');if(savedUrl)$('sbUrl').value=savedUrl;if(savedKey)$('sbKey').value=savedKey;if(savedUrl&&savedKey){sb=window.supabase.createClient(savedUrl,savedKey);$('auth').hidden=false;checkSession()}
-</script></body></html>
+
+$('importBtn').onclick=async()=>{
+  let f=$('importFile').files[0];if(!f)return msg('Selecciona un archivo JSON.','error');
+  try{
+    let j=JSON.parse(await f.text()),arr=Array.isArray(j)?j:(j.data?.entries||j.entries);
+    if(!Array.isArray(arr))throw Error('El JSON no contiene diligencias.');
+    let added=0;
+    for(let x of arr){
+      let row={date:x.date,month:x.month||x.date?.slice(0,7),q:x.q||Math.ceil(Number(x.date?.slice(8,10))/15),
+        colaborador:x.colaborador||'',departamento:x.departamento||'Mensajería',cargo:x.cargo||'Mensajero',
+        destino:x.destino||'',motivo:x.motivo||'',salida:x.salida||'',regreso:x.regreso||'',hours:Number(x.hours)||0,
+        sobre:Number(x.sobre)||0,viatico:Number(x.viatico)||0,codigo:x.codigo||'',supervisor:x.supervisor||'',
+        obs:x.obs||'',aprob:x.aprob||'Pendiente',created_by:user.id};
+      let {error}=await sb.from('diligencias').insert(row);
+      if(error)throw error; added++;
+    }
+    msg(`Importación procesada: ${added} registros enviados.`,'ok');loadRecords();
+  }catch(e){msg('Error de importación: '+e.message,'error')}
+};
+
+sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+checkSession();
+</script>
+</body>
+</html>

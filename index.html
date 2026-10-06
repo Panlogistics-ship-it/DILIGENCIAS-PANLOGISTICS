@@ -351,12 +351,13 @@ async function loadProfiles(){
 function isAdmin(){return currentProfile?.role==='ADMIN' && currentProfile?.active===true}
 
 function fillCollaboratorSelects(){
-  const opts=profiles.map(p=>`<option value="${p.id}">${esc(p.full_name||p.email)}</option>`).join('');
-  $('evalCollaborator').innerHTML=opts||'<option value="">Sin usuarios activos</option>';
-  $('resultCollaborator').innerHTML='<option value="">Todos</option>'+opts;
-  if(user){
-    $('evalCollaborator').value=profiles.some(p=>p.id===user.id)?user.id:(profiles[0]?.id||'');
-    $('resultCollaborator').value=profiles.some(p=>p.id===user.id)?user.id:'';
+  const messengers=profiles.filter(p=>p.role==='OPERADOR' && p.active===true);
+  const opts=messengers.map(p=>`<option value="${p.id}">${esc(p.full_name||p.email)}</option>`).join('');
+  $('evalCollaborator').innerHTML=opts||'<option value="">No hay mensajeros activos</option>';
+  $('resultCollaborator').innerHTML='<option value="">Todos los mensajeros</option>'+opts;
+  if(messengers.length){
+    $('evalCollaborator').value=messengers[0].id;
+    if(messengers.some(p=>p.id===user?.id)) $('resultCollaborator').value=user.id;
   }
 }
 

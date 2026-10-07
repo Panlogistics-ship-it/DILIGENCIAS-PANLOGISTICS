@@ -131,20 +131,6 @@ textarea{min-height:72px}
 .report-status.complete{background:#e8f5ee;color:#176b42}
 @media(max-width:900px){.report-preview-wrap{padding:6px;overflow:auto}.report-page{box-shadow:none}}
 @media(max-width:900px){.report-preview-wrap{padding:6px;overflow:auto}.report-page{box-shadow:none}}
-@media print{
-  @page{size:Letter portrait;margin:0}
-  html,body{background:#fff!important;margin:0!important;padding:0!important}
-  body>header,body>#status,body>#auth{display:none!important}
-  body>main{display:block!important;max-width:none!important;margin:0!important;padding:0!important}
-  body>main>#app{display:block!important}
-  #app>.tabs,#app>.notice{display:none!important}
-  #reportsView{display:block!important}
-  #reportsView>.report-controls{display:none!important}
-  #reportPreview{display:block!important}
-  .report-preview-wrap{display:block!important;padding:0!important;margin:0!important;background:#fff!important;border-radius:0!important}
-  .report-page{display:block!important;width:8.5in!important;min-height:11in!important;margin:0!important;box-shadow:none!important;padding:.48in .55in .52in!important}
-}
-
 .fuel-card{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px;background:#fff}
 .fuel-total{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px}
 .fuel-total strong{font-size:22px;color:var(--navy)}
@@ -199,13 +185,22 @@ textarea{min-height:72px}
 }
 
 @media print{
-  /* V15: reporte Carta de dos páginas, legible y sin pérdida de información */
+  /* V17: impresión Carta de dos páginas, sin salto de página doble */
   @page{size:Letter portrait;margin:0}
   html,body{background:#fff!important;margin:0!important;padding:0!important}
-  .report-preview-wrap{display:block!important;padding:0!important;margin:0!important;background:#fff!important;border-radius:0!important}
-  .report-page{width:8.5in!important;min-height:11in!important;height:auto!important;box-sizing:border-box!important;margin:0!important;padding:.38in .48in .42in!important;box-shadow:none!important;break-after:page;page-break-after:always;overflow:visible!important}
+  body>header,body>#status,body>#auth{display:none!important}
+  body>main{display:block!important;max-width:none!important;margin:0!important;padding:0!important}
+  body>main>#app{display:block!important}
+  #app>.tabs,#app>.notice{display:none!important}
+  #reportsView{display:block!important}
+  #reportsView>.report-controls{display:none!important}
+  #reportPreview{display:block!important}
+  .report-preview-wrap{display:block!important;padding:0!important;margin:0!important;background:#fff!important;border-radius:0!important;overflow:visible!important}
+  .report-page{display:block!important;width:8.5in!important;min-height:11in!important;height:auto!important;box-sizing:border-box!important;margin:0!important;padding:.38in .48in .42in!important;box-shadow:none!important;overflow:visible!important}
+  /* Solo la primera hoja fuerza el salto; la segunda NO vuelve a forzarlo. */
+  .report-page:first-child{break-after:page;page-break-after:always}
   .report-page:last-child{break-after:auto;page-break-after:auto}
-  .report-page.continuation{break-before:page;page-break-before:always}
+  .report-page.continuation{break-before:auto!important;page-break-before:auto!important}
   .report-header{gap:12px!important;padding-bottom:9px!important}
   .report-logo{max-height:76px!important}
   .report-company h1{font-size:19px!important}

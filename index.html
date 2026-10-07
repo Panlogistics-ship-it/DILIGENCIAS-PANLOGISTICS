@@ -69,6 +69,10 @@ textarea{min-height:72px}
 .badge.warn{background:#fff3d7;color:#8b5b00}
 @media(max-width:680px){.kpi-grid{grid-template-columns:1fr 1fr}.cone-wrap{grid-template-columns:1fr}.evaluation-grid{grid-template-columns:1fr 90px}.result-row{grid-template-columns:1fr}}
 @media(max-width:390px){.kpi-grid{grid-template-columns:1fr 1fr}.kpi strong{font-size:17px}}
+
+.fuel-card{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px;background:#fff}
+.fuel-total{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px}
+.fuel-total strong{font-size:22px;color:var(--navy)}
 </style>
 </head>
 <body>
@@ -113,7 +117,7 @@ textarea{min-height:72px}
 
     <div class="tabs">
       <button class="tab active" data-tab="formView">＋ Registrar</button>
-      <button class="tab" data-tab="listView">☷ Historial</button>
+      <button class="tab" data-tab="listView">☷ Historial</button><button class="tab" data-tab="fuelView">⛽ Combustible</button>
       <button class="tab" data-tab="evaluationView">★ Evaluación</button><button class="tab" data-tab="resultsView">◈ Resultados</button><button class="tab" data-tab="exportView">⇧ Exportar</button>
     </div>
 
@@ -153,6 +157,28 @@ textarea{min-height:72px}
       </div>
     </section>
 
+
+
+    <section id="fuelView" hidden>
+      <div class="panel">
+        <h2>Registro de combustible</h2>
+        <p class="hint">Registre el abastecimiento usando litros y precio por litro. El sistema calcula el costo total y conserva la conversión interna a galones.</p><p id="fuelDataHint" class="hint" style="margin-top:6px"></p>
+        <div class="grid">
+          <div class="field"><label>Fecha *</label><input id="fuelDate" type="date" required></div>
+          <div class="field"><label>Mensajero *</label><select id="fuelCollaborator" required><option value="6ee6abb9-19de-4c3e-b20d-258faa0c1e65">Jhonatan Valencia</option></select></div>
+          <div class="field"><label>Vehículo *</label><select id="fuelVehicle" required><option value="b163cc93-1ce5-498f-9f5c-f8e2b9228080">EE8016 · HYUNDAI GRAND I10</option></select></div>
+          <div class="field"><label>Odómetro (km)</label><input id="fuelOdometer" type="number" min="0" step="0.01" placeholder="224909"></div>
+          <div class="field"><label>Litros *</label><input id="fuelLiters" type="number" min="0.001" step="0.001" placeholder="Ej. 37.177" required></div>
+          <div class="field"><label>Precio por litro (B/.) *</label><input id="fuelPriceLiter" type="number" min="0" step="0.000001" placeholder="Ej. 1.318019" required></div>
+          <div class="field"><label>Tipo de carga *</label><select id="fuelLoadType"><option value="COMPLETA">COMPLETA</option><option value="PARCIAL">PARCIAL</option></select></div>
+          <div class="field"><label>Estación</label><input id="fuelStation" placeholder="Ej. Texaco Ave. Frangipanni"></div>
+          <div class="field full"><label>Observación</label><textarea id="fuelObs" placeholder="Detalle del abastecimiento, si aplica…"></textarea></div>
+        </div>
+        <div class="fuel-total"><span class="hint">Costo estimado (litros × B/. por litro)</span><strong id="fuelCostPreview">B/. 0.00</strong></div>
+        <div class="actions"><button class="btn primary" id="saveFuel" type="button">Guardar combustible</button><button class="btn secondary" id="clearFuel" type="button">Limpiar</button></div>
+      </div>
+      <div class="panel"><h2>Abastecimientos registrados</h2><div id="fuelList"></div></div>
+    </section>
 
     <section id="evaluationView" hidden>
       <div class="panel">
@@ -227,7 +253,7 @@ const SUPABASE_URL='https://stujfwqzbtbqfapmvpog.supabase.co';
 const SUPABASE_KEY='sb_publishable_RtUb5ukwLAWBKIwuGi09RQ_4lj3zscv';
 
 const $=id=>document.getElementById(id);
-let sb=null,user=null,editing=null,records=[],profiles=[],currentProfile=null;
+let sb=null,user=null,editing=null,records=[],profiles=[],currentProfile=null,vehicles=[],fuelRecords=[];
 const fields=['date','colaborador','departamento','cargo','destino','motivo','salida','regreso','sobre','viatico','codigo','supervisor','obs'];
 
 function msg(t,type=''){const el=$('status');el.hidden=false;el.textContent=t;el.className='status '+type}
@@ -236,7 +262,7 @@ function dur(a,b){if(!a||!b)return 0;let [h,m]=a.split(':').map(Number),[x,y]=b.
 function money(n){return (Number(n)||0).toLocaleString('es-PA',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function tab(id){
-  ['formView','listView','evaluationView','resultsView','exportView'].forEach(x=>$(x).hidden=x!==id);
+  ['formView','listView','fuelView','evaluationView','resultsView','exportView'].forEach(x=>$(x).hidden=x!==id);
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
   if(id==='listView')loadRecords();
   if(id==='evaluationView')loadEvaluationData();
@@ -324,7 +350,7 @@ function render(){
     <div class="entrybuttons"><button class="btn secondary" onclick="edit('${x.id}')">Editar</button></div>
   </article>`).join(''):'<div class="empty">No hay registros para este filtro.</div>';
 }
-$('filterMonth').value=today().slice(0,7);$('evalMonth').value=today().slice(0,7);$('resultMonth').value=today().slice(0,7);
+$('filterMonth').value=today().slice(0,7);$('evalMonth').value=today().slice(0,7);$('resultMonth').value=today().slice(0,7);$('fuelDate').value=today();
 $('filterMonth').onchange=render;$('filterName').oninput=render;$('refresh').onclick=loadRecords;
 
 window.edit=async id=>{
@@ -360,6 +386,151 @@ function fillCollaboratorSelects(){
     if(messengers.some(p=>p.id===user?.id)) $('resultCollaborator').value=user.id;
   }
 }
+
+
+async function loadVehicles(){
+  const {data,error}=await sb.from('vehiculos').select('id,placa,marca,modelo,anio,tipo_combustible,colaborador_id,activo').eq('activo',true).order('placa');
+  if(error){msg('No se pudieron cargar los vehículos: '+error.message,'error');return []}
+  vehicles=data||[]; return vehicles;
+}
+function fillFuelSelectors(){
+  const messengers=profiles.filter(p=>
+    p.active===true &&
+    String(p.role??'').trim().toUpperCase()==='OPERADOR'
+  );
+
+  const opts=messengers.map(p=>
+    `<option value="${p.id}">${esc(p.full_name||p.email)}</option>`
+  ).join('');
+
+  if(isAdmin()){
+    const current=$('fuelCollaborator').value;
+    $('fuelCollaborator').innerHTML=opts||'<option value="6ee6abb9-19de-4c3e-b20d-258faa0c1e65">Jhonatan Valencia</option>';
+    $('fuelCollaborator').disabled=false;
+    if(messengers.length===1){
+      $('fuelCollaborator').value=String(messengers[0].id);
+    }else if(messengers.length>1 && messengers.some(p=>String(p.id)===String(current))){
+      $('fuelCollaborator').value=current;
+    }else if(messengers.length>1){
+      $('fuelCollaborator').value=String(messengers[0].id);
+    }else{
+      $('fuelCollaborator').value='6ee6abb9-19de-4c3e-b20d-258faa0c1e65';
+    }
+  }else{
+    const own=messengers.find(p=>String(p.id)===String(user?.id));
+    $('fuelCollaborator').innerHTML=own
+      ? `<option value="${own.id}">${esc(own.full_name||own.email)}</option>`
+      : '<option value="6ee6abb9-19de-4c3e-b20d-258faa0c1e65">Jhonatan Valencia</option>';
+    $('fuelCollaborator').disabled=true;
+    $('fuelCollaborator').value=String(own?.id||user?.id||'6ee6abb9-19de-4c3e-b20d-258faa0c1e65');
+  }
+
+  refreshFuelVehicles();
+  $('fuelDataHint').textContent = messengers.length ? `Operadores activos disponibles: ${messengers.length} · Vehículos activos cargados: ${vehicles.length}` : '';
+
+  if(!messengers.length){
+    msg('No se encontraron operadores activos para registrar combustible. Verifique el rol/estado en Perfiles.','error');
+  }
+}
+function refreshFuelVehicles(){
+  const collaboratorId=$('fuelCollaborator').value;
+  const previous=$('fuelVehicle').value;
+  const list=vehicles.filter(v=>
+    v.activo===true &&
+    String(v.colaborador_id??'')===String(collaboratorId??'')
+  );
+
+  if(list.length){
+    $('fuelVehicle').innerHTML=list.map(v=>`<option value="${v.id}">${esc(v.placa)} · ${esc(v.marca||'')} ${esc(v.modelo||'')}</option>`).join('');
+    $('fuelVehicle').value=list.some(v=>String(v.id)===String(previous))?previous:String(list[0].id);
+  }else if(previous){
+    // Keep the seeded/previous vehicle visible while the data refresh is settling.
+    $('fuelVehicle').innerHTML='<option value="'+esc(previous)+'">EE8016 · HYUNDAI GRAND I10</option>';
+    $('fuelVehicle').value=previous;
+  }else{
+    $('fuelVehicle').innerHTML='<option value="">No hay vehículo activo asignado</option>';
+  }
+}
+function clearFuel(){
+  $('fuelDate').value=today();$('fuelOdometer').value='';$('fuelLiters').value='';$('fuelPriceLiter').value='';
+  $('fuelLoadType').value='COMPLETA';$('fuelStation').value='';$('fuelObs').value='';
+  if(!isAdmin() && user?.id)$('fuelCollaborator').value=user.id;
+  refreshFuelVehicles();updateFuelPreview();
+}
+function updateFuelPreview(){
+  const liters=Number($('fuelLiters').value)||0,price=Number($('fuelPriceLiter').value)||0;
+  $('fuelCostPreview').textContent='B/. '+money(liters*price);
+}
+function renderFuelList(){
+  const rows=fuelRecords||[];
+  $('fuelList').innerHTML=rows.length?rows.map(x=>{
+    const v=vehicles.find(z=>z.id===x.vehiculo_id),p=profiles.find(z=>z.id===x.colaborador_id);
+    const liters=Number(x.litros||0),price=Number(x.precio_litro||0),cost=Number(x.costo_total||liters*price||0);
+    return `<article class="fuel-card"><div class="entrytop"><div><h3>${esc(x.fecha)} · ${esc(v?.placa||'Vehículo')}</h3><p>${esc(p?.full_name||x.colaborador_id)} · ${esc(v?.marca||'')} ${esc(v?.modelo||'')}</p></div><span class="pill">${esc(x.tipo_carga||'PARCIAL')}</span></div><p>${liters.toFixed(3)} L · B/. ${price.toFixed(6)}/L · <strong>B/. ${money(cost)}</strong></p><p>Odómetro: ${x.odometro==null?'—':Number(x.odometro).toLocaleString('es-PA')} km · ${esc(x.estacion||'Sin estación')}</p>${x.observacion?`<p>${esc(x.observacion)}</p>`:''}</article>`;
+  }).join(''):'<div class="empty">No hay abastecimientos registrados.</div>';
+}
+async function loadFuelData(){
+  if(!user)return;
+
+  const {data:profileData,error:profileError}=await sb
+    .from('profiles')
+    .select('id,full_name,email,role,active')
+    .eq('active',true)
+    .order('full_name');
+
+  if(profileError){
+    msg('No se pudieron cargar los mensajeros: '+profileError.message,'error');
+    return;
+  }
+  profiles=profileData||[];
+
+  const {data:vehicleData,error:vehicleError}=await sb
+    .from('vehiculos')
+    .select('id,placa,marca,modelo,anio,tipo_combustible,colaborador_id,activo')
+    .eq('activo',true)
+    .order('placa');
+
+  if(vehicleError){
+    msg('No se pudieron cargar los vehículos: '+vehicleError.message,'error');
+    return;
+  }
+  vehicles=vehicleData||[];
+
+  fillFuelSelectors();
+
+  let q=sb.from('combustible')
+    .select('*')
+    .order('fecha',{ascending:false})
+    .order('created_at',{ascending:false})
+    .limit(100);
+
+  if(!isAdmin())q=q.eq('colaborador_id',user.id);
+
+  const {data,error}=await q;
+  if(error){
+    $('fuelList').innerHTML='<div class="status error">No se pudieron cargar los abastecimientos: '+esc(error.message)+'</div>';
+    return;
+  }
+
+  fuelRecords=data||[];
+  renderFuelList();
+  updateFuelPreview();
+}
+$('fuelCollaborator').onchange=refreshFuelVehicles;
+$('fuelLiters').oninput=updateFuelPreview;
+$('fuelPriceLiter').oninput=updateFuelPreview;
+$('clearFuel').onclick=clearFuel;
+$('saveFuel').onclick=async()=>{
+  if(!user)return msg('Inicie sesión antes de guardar.','error');
+  const colaborador_id=$('fuelCollaborator').value,vehiculo_id=$('fuelVehicle').value;
+  const litros=Number($('fuelLiters').value),precio_litro=Number($('fuelPriceLiter').value);
+  if(!colaborador_id||!vehiculo_id)return msg('Seleccione mensajero y vehículo.','error');
+  if(!(litros>0)||precio_litro<0)return msg('Indique litros y precio por litro válidos.','error');
+  const row={fecha:$('fuelDate').value||today(),colaborador_id,vehiculo_id,odometro:$('fuelOdometer').value===''?null:Number($('fuelOdometer').value),litros,precio_litro,tipo_carga:$('fuelLoadType').value,estacion:$('fuelStation').value.trim()||null,observacion:$('fuelObs').value.trim()||null,created_by:user.id};
+  const {error}=await sb.from('combustible').insert(row);
+  if(error)return msg('No se pudo guardar el combustible: '+error.message,'error');
+  msg('Abastecimiento guardado correctamente.','ok');clearFuel();await loadFuelData();
+};
 
 function evaluationValues(){
   return {

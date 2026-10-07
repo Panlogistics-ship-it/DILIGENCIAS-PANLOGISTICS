@@ -130,31 +130,19 @@ textarea{min-height:72px}
 .report-status{display:inline-block;padding:4px 9px;border-radius:999px;background:#fff0c9;color:#8b5b00;font-size:9px;font-weight:900}
 .report-status.complete{background:#e8f5ee;color:#176b42}
 @media(max-width:900px){.report-preview-wrap{padding:6px;overflow:auto}.report-page{box-shadow:none}}
-@media print{
-  @page{size:Letter portrait;margin:0}
-  body{background:#fff!important}
-  body>*{display:none!important}
-  #app{display:block!important}
-  #app>.tabs,#app>.notice,#status,#auth{display:none!important}
-  #reportsView{display:block!important}
-  #reportsView>.report-controls{display:none!important}
-  #reportPreview{display:block!important}
-  .report-preview-wrap{padding:0!important;margin:0!important;background:#fff!important}
-  .report-page{width:8.5in!important;min-height:11in!important;margin:0!important;box-shadow:none!important;padding:.42in .46in .48in!important}
-}
-
 @media(max-width:900px){.report-preview-wrap{padding:6px;overflow:auto}.report-page{box-shadow:none}}
 @media print{
   @page{size:Letter portrait;margin:0}
-  body{background:#fff!important}
-  body>*{display:none!important}
-  #app{display:block!important}
-  #app>.tabs,#app>.notice,#status,#auth{display:none!important}
+  html,body{background:#fff!important;margin:0!important;padding:0!important}
+  body>header,body>#status,body>#auth{display:none!important}
+  body>main{display:block!important;max-width:none!important;margin:0!important;padding:0!important}
+  body>main>#app{display:block!important}
+  #app>.tabs,#app>.notice{display:none!important}
   #reportsView{display:block!important}
   #reportsView>.report-controls{display:none!important}
   #reportPreview{display:block!important}
-  .report-preview-wrap{padding:0!important;margin:0!important;background:#fff!important}
-  .report-page{width:8.5in!important;min-height:11in!important;margin:0!important;box-shadow:none!important;padding:.48in .55in .52in!important}
+  .report-preview-wrap{display:block!important;padding:0!important;margin:0!important;background:#fff!important;border-radius:0!important}
+  .report-page{display:block!important;width:8.5in!important;min-height:11in!important;margin:0!important;box-shadow:none!important;padding:.48in .55in .52in!important}
 }
 
 .fuel-card{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px;background:#fff}

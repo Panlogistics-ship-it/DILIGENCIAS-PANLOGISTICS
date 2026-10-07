@@ -148,6 +148,49 @@ textarea{min-height:72px}
 .fuel-card{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px;background:#fff}
 .fuel-total{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px}
 .fuel-total strong{font-size:22px;color:var(--navy)}
+
+@media print{
+  /* V14: reporte Carta de una sola página */
+  @page{size:Letter portrait;margin:0}
+  .report-page{
+    width:8.5in!important;
+    height:11in!important;
+    min-height:0!important;
+    box-sizing:border-box!important;
+    padding:.28in .38in .30in!important;
+    overflow:hidden!important;
+    zoom:.84!important;
+    margin:0!important;
+  }
+  .report-header{gap:9px!important;padding-bottom:7px!important}
+  .report-logo{max-height:68px!important}
+  .report-company h1{font-size:17px!important}
+  .report-company p,.report-doc{font-size:8px!important}
+  .report-doc strong{font-size:10px!important;margin-bottom:2px!important}
+  .report-title{margin:9px 0 6px!important}
+  .report-title h2{font-size:16px!important}
+  .report-title p{font-size:8px!important;margin-top:3px!important}
+  .report-meta{gap:5px!important;margin:6px 0!important}
+  .report-meta div{padding:5px 7px!important}
+  .report-meta span{font-size:7px!important}
+  .report-meta strong{font-size:10px!important;margin-top:2px!important}
+  .report-kpis{gap:5px!important;margin:6px 0 8px!important}
+  .report-kpi{padding:6px 5px!important}
+  .report-kpi span{font-size:7px!important}
+  .report-kpi strong{font-size:15px!important;margin-top:2px!important}
+  .report-section-title{font-size:9px!important;padding:5px 8px!important;margin:7px 0 4px!important}
+  .report-table{font-size:8px!important}
+  .report-table th{padding:4px!important;font-size:7px!important}
+  .report-table td{padding:4px!important}
+  .report-total{gap:7px!important;margin-top:7px!important}
+  .report-score{padding:6px!important}
+  .report-score span,.report-score small{font-size:7px!important}
+  .report-score strong{font-size:24px!important;margin-top:3px!important}
+  .report-note{padding:6px!important;font-size:8px!important;line-height:1.25!important}
+  .report-signatures{gap:28px!important;margin-top:12px!important}
+  .report-sign{padding-top:13px!important;font-size:7px!important}
+  .report-footer{margin-top:7px!important;padding-top:4px!important;font-size:6.5px!important}
+}
 </style>
 </head>
 <body>

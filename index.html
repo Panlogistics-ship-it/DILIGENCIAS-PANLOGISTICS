@@ -198,6 +198,43 @@ header .head{text-align:center}
   .form-brand { width: min(155px, 70%); height: 45px; }
 }
 
+
+/* Corrección de navegación móvil: los 10 botones se distribuyen en una cuadrícula legible. */
+@media screen and (max-width: 640px) {
+  #app > .tabs {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    width: 100% !important;
+    margin-bottom: 13px !important;
+    align-items: stretch !important;
+  }
+  #app > .tabs > .tab {
+    display: flex !important;
+    flex: initial !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    min-height: 58px !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+    line-height: 1.2 !important;
+    padding: 9px 4px !important;
+    font-size: 12px !important;
+  }
+  #app > .tabs > .tab.active {
+    min-width: 0 !important;
+  }
+}
+@media screen and (max-width: 360px) {
+  #app > .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #app > .tabs > .tab { font-size: 12px !important; min-height: 54px !important; }
+}
+
 </style>
 </head>
 <body>

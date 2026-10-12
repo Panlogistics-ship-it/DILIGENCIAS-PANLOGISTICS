@@ -851,12 +851,19 @@ function fillCollaboratorSelects(){
 }
 
 async function loadEvaluators(){
-  const {data,error}=await sb.from('profiles').select('id,full_name,email,role,active').eq('active',true).eq('role','EVALUADOR').order('full_name');
+  const {data,error}=await sb.from('profiles').select('id,full_name,email,role,active').eq('active',true).order('full_name');
   if(error){msg('No se pudieron cargar los evaluadores: '+error.message,'error');return []}
-  const arr=data||[];
+  // Mostrar evaluadores activos y permitir al administrador Richard evaluar también,
+  // sin cambiar su rol ADMIN. La cuenta de prueba se oculta solo del formulario.
+  const arr=(data||[]).filter(p=>{
+    const email=String(p.email||'').trim().toLowerCase();
+    const role=String(p.role||'').trim().toUpperCase();
+    return email!=='evaluador.prueba@panlogistics.test' &&
+      (role==='EVALUADOR' || (role==='ADMIN' && email==='richard@transalmaint.com'));
+  });
   if($('entryEvaluator')){
     const prev=$('entryEvaluator').value;
-    $('entryEvaluator').innerHTML=arr.length?arr.map(p=>`<option value="${p.id}">${esc(p.full_name||p.email)}</option>`).join(''):'<option value="">No hay evaluadores activos</option>';
+    $('entryEvaluator').innerHTML=arr.length?arr.map(p=>`<option value="${p.id}">${esc(p.full_name||p.email)}</option>`).join(''):'<option value="">No hay evaluadores activos disponibles</option>';
     if(prev && arr.some(p=>String(p.id)===String(prev))) $('entryEvaluator').value=prev;
     else if(arr.length) $('entryEvaluator').value=arr[0].id;
   }

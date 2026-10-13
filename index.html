@@ -240,6 +240,51 @@ textarea{min-height:72px}
   .evaluation-grid { grid-template-columns: minmax(0, 1fr) 86px; }
 }
 
+
+/* Reporte legible en móvil: se adapta al ancho sin desplazamiento horizontal */
+@media screen and (max-width: 680px) {
+  #reportPreview, .report-preview-wrap { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
+  .report-preview-wrap { padding:6px!important; margin-top:10px!important; overflow-x:hidden!important; overflow-y:visible!important; }
+  .report-page { width:100%!important; max-width:100%!important; min-height:0!important; margin:0!important; padding:12px!important; box-sizing:border-box!important; overflow-wrap:anywhere; box-shadow:none!important; }
+  .report-header { grid-template-columns:minmax(0,1fr)!important; gap:8px!important; text-align:center; }
+  .report-logo { width:auto!important; max-width:min(240px,100%)!important; max-height:66px!important; object-position:center!important; }
+  .report-company { text-align:center!important; }
+  .report-company h1 { font-size:17px!important; }
+  .report-company p { font-size:9px!important; }
+  .report-doc { text-align:center!important; font-size:9px!important; }
+  .report-title { margin:12px 0 8px!important; }
+  .report-title h2 { font-size:15px!important; line-height:1.25; }
+  .report-meta { grid-template-columns:minmax(0,1fr)!important; gap:6px!important; }
+  .report-meta div { padding:7px 8px!important; }
+  .report-kpis { grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:6px!important; }
+  .report-kpi { min-width:0; padding:8px 4px!important; overflow-wrap:anywhere; }
+  .report-kpi strong { font-size:17px!important; }
+  .report-total { grid-template-columns:minmax(0,1fr)!important; gap:8px!important; }
+  .report-score strong { font-size:30px!important; }
+  .report-table { width:100%!important; table-layout:fixed!important; font-size:8px!important; }
+  .report-table th, .report-table td { padding:4px 3px!important; overflow-wrap:anywhere; word-break:break-word; }
+  .report-table th { font-size:7px!important; letter-spacing:0!important; }
+  .report-signatures { gap:12px!important; }
+  .report-footer { gap:8px!important; flex-wrap:wrap; }
+}
+
+/* Impresión/PDF: ocultar sesión y controles, respetar márgenes físicos y evitar recortes laterales */
+@page { size: Letter portrait; margin: 0.42in; }
+@media print {
+  html, body { width:auto!important; height:auto!important; margin:0!important; padding:0!important; background:#fff!important; overflow:visible!important; }
+  body > * { display:none!important; }
+  body > main { display:block!important; margin:0!important; padding:0!important; width:auto!important; }
+  #status, #auth, #app > .notice, #app > .topbar, #app > .tabs, #app > .panel:not(.report-controls), #app > .notice { display:none!important; }
+  #app { display:block!important; width:auto!important; max-width:none!important; margin:0!important; padding:0!important; }
+  #reportsView { display:block!important; width:auto!important; margin:0!important; padding:0!important; }
+  #reportsView > .report-controls { display:none!important; }
+  #reportPreview { display:block!important; width:auto!important; max-width:none!important; margin:0!important; padding:0!important; }
+  .report-preview-wrap { display:block!important; width:auto!important; max-width:none!important; margin:0!important; padding:0!important; overflow:visible!important; background:#fff!important; border-radius:0!important; }
+  .report-page { display:block!important; width:100%!important; max-width:none!important; min-height:0!important; margin:0!important; padding:0!important; box-sizing:border-box!important; box-shadow:none!important; overflow:visible!important; }
+  .report-header, .report-title, .report-meta, .report-kpis, .report-total, .report-section-title, .report-table, .report-note, .report-signatures, .report-footer { break-inside:avoid; page-break-inside:avoid; }
+  .report-table tr { break-inside:avoid; page-break-inside:avoid; }
+}
+
 </style>
 </head>
 <body>

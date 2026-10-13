@@ -89,6 +89,14 @@ textarea{min-height:72px}
 .badge.ok{background:#e8f5ee;color:var(--green)}
 .badge.warn{background:#fff3d7;color:#8b5b00}
 @media(max-width:680px){.kpi-grid{grid-template-columns:1fr 1fr}.cone-wrap{grid-template-columns:1fr}.evaluation-grid{grid-template-columns:1fr 90px}.result-row{grid-template-columns:1fr}}
+
+@media(max-width:680px){
+  nav,.tabs,.tabbar{flex-wrap:wrap}
+  .tab{flex:1 1 calc(33.333% - 8px);min-width:0;white-space:normal;overflow-wrap:anywhere;padding:10px 6px;font-size:12px;line-height:1.25;min-height:54px}
+  .actions .btn{min-width:0}
+  .grid{grid-template-columns:1fr}
+}
+
 @media(max-width:390px){.kpi-grid{grid-template-columns:1fr 1fr}.kpi strong{font-size:17px}}
 
 
@@ -838,12 +846,18 @@ $('clearIncident').onclick=clearIncident;$('incidentDate').value=today();
 $('refreshUsers').onclick=loadUsersData;
 
 function fillCollaboratorSelects(){
+  // Conservar la selección de Resultados: esta función también se ejecuta al actualizar el filtro.
+  const previousResult=$('resultCollaborator')?.value ?? '';
   const messengers=profiles.filter(p=>String(p.role??'').trim().toUpperCase()==='OPERADOR' && p.active===true);
   const opts=messengers.map(p=>`<option value="${p.id}">${esc(p.full_name||p.email)}</option>`).join('');
 
   if($('entryCollaborator')) $('entryCollaborator').innerHTML=opts||'<option value="">No hay operadores activos</option>';
   if($('evalCollaborator')) $('evalCollaborator').innerHTML=opts||'<option value="">No hay operadores activos</option>';
-  if($('resultCollaborator')) $('resultCollaborator').innerHTML='<option value="">Todos los mensajeros</option>'+opts;
+  if($('resultCollaborator')) {
+    $('resultCollaborator').innerHTML='<option value="">Todos los mensajeros</option>'+opts;
+    $('resultCollaborator').value=messengers.some(p=>String(p.id)===String(previousResult))?previousResult:'';
+    if(!messengers.length) $('resultCollaborator').innerHTML='<option value="">No hay mensajeros activos disponibles</option>';
+  }
 
   if(isOperator()){
     const own=messengers.find(p=>String(p.id)===String(user?.id));
@@ -855,7 +869,7 @@ function fillCollaboratorSelects(){
     if(messengers.length){
       if($('entryCollaborator')) $('entryCollaborator').value=$('entryCollaborator').value||messengers[0].id;
       if($('evalCollaborator')) $('evalCollaborator').value=messengers[0].id;
-      if($('resultCollaborator')) $('resultCollaborator').value='';
+      // La selección de resultados se conserva en fillCollaboratorSelects().
     }
   }
   if($('colaborador')) $('colaborador').value=messengers.find(p=>String(p.id)===String($('entryCollaborator')?.value))?.full_name||'';

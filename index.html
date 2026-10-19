@@ -285,6 +285,8 @@ textarea{min-height:72px}
   .report-table tr { break-inside:avoid; page-break-inside:avoid; }
 }
 
+
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px}.photo-grid img{width:100%;height:130px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.photo-modal{position:fixed;inset:0;background:#101827cc;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}.photo-modal-card{background:white;border-radius:14px;padding:18px;width:min(900px,100%);max-height:90vh;overflow:auto}.photo-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
 </style>
 </head>
 <body>
@@ -358,6 +360,12 @@ textarea{min-height:72px}
             <div class="field"><label>Código / referencia</label><input id="codigo"></div>
             <div class="field"><label>Supervisor</label><input id="supervisor"></div>
             <div class="field full"><label>Observaciones / resultado</label><textarea id="obs" placeholder="Resultado de la diligencia…"></textarea></div>
+          </div>
+          <div class="field full" style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#f8fafc">
+            <label for="diligencePhotos"><strong>📷 Evidencia fotográfica de la diligencia</strong></label>
+            <p class="hint">Al registrar una diligencia, Jhonatan puede tomar o seleccionar varias fotos desde el móvil. Se guardarán asociadas a esta diligencia para consulta del administrador y del evaluador asignado.</p>
+            <input id="diligencePhotos" type="file" accept="image/*" capture="environment" multiple>
+            <div id="diligencePhotoPreview" class="hint" aria-live="polite">No hay fotos seleccionadas.</div>
           </div>
           <p class="hint">La duración se calcula automáticamente. Si termina después de medianoche, se contempla el cambio de día.</p>
           <div class="actions"><button class="btn primary" type="submit">Guardar en sistema</button><button class="btn secondary" type="button" id="clear">Limpiar</button></div>
@@ -675,7 +683,12 @@ $('saveSettings').onclick=saveSettings;
 $('refreshSettings').onclick=loadSettings;
 
 function resetForm(){
-  $('entryForm').reset();$('entryId').value='';editing=null;$('date').value=today();
+  $('entryForm').reset();
+  // Clear both the visible file input and the in-memory file list.
+  diligencePhotoFiles=[];
+  if($('diligencePhotos')) $('diligencePhotos').value='';
+  if($('diligencePhotoPreview')) $('diligencePhotoPreview').textContent='No hay fotos seleccionadas.';
+  $('entryId').value='';editing=null;$('date').value=today();
   $('departamento').value='Mensajería';$('cargo').value='Mensajero';$('sobre').value='0';$('viatico').value='0';
   $('formTitle').textContent='Nueva diligencia';
   if($('entryEvaluator')) $('entryEvaluator').value=$('entryEvaluator').value||'';
@@ -722,6 +735,47 @@ async function doLogout(){
 }
 $('logoutTop').onclick=doLogout;
 
+
+const PHOTO_BUCKET='diligencia-evidencias';
+let diligencePhotoFiles=[];
+$('diligencePhotos')?.addEventListener('change',e=>{
+  diligencePhotoFiles=Array.from(e.target.files||[]);
+  const preview=$('diligencePhotoPreview');
+  if(!preview)return;
+  preview.textContent=diligencePhotoFiles.length?`${diligencePhotoFiles.length} foto(s) seleccionada(s). Se subirán al guardar la diligencia.`:'No hay fotos seleccionadas.';
+});
+async function uploadDiligencePhotos(diligenceId, files){
+  if(!files?.length)return;
+  for(const file of files){
+    if(!file.type.startsWith('image/'))throw new Error('Solo se permiten archivos de imagen.');
+    if(file.size>10*1024*1024)throw new Error(`La foto ${file.name} supera el límite de 10 MB.`);
+    const safeName=file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]/g,'_').slice(-100)||'foto.jpg';
+    const path=`${diligenceId}/${Date.now()}_${crypto.randomUUID()}_${safeName}`;
+    const {error:upErr}=await sb.storage.from(PHOTO_BUCKET).upload(path,file,{contentType:file.type,upsert:false});
+    if(upErr)throw new Error('No se pudo subir '+file.name+': '+upErr.message);
+    const {error:metaErr}=await sb.from('diligencia_fotos').insert({diligencia_id:String(diligenceId),storage_path:path,nombre_archivo:file.name,content_type:file.type,tamano_bytes:file.size,subido_por:user.id});
+    if(metaErr){await sb.storage.from(PHOTO_BUCKET).remove([path]);throw new Error('La foto se subió pero no se pudo asociar a la diligencia: '+metaErr.message);}
+  }
+}
+window.showDiligencePhotos=async id=>{
+  if(!user||!(isAdmin()||isEvaluator()||isOperator()))return msg('No tiene permiso para consultar evidencias.','error');
+  let d=(records||[]).find(x=>String(x.id)===String(id));
+  // Fail closed: if the diligence is not in the current list, fetch its owner/assignee before showing any evidence.
+  if(!d){
+    const {data:diligence,error:diligenceError}=await sb.from('diligencias').select('id,colaborador_id,evaluador_id').eq('id',id).maybeSingle();
+    if(diligenceError)return msg('No se pudo verificar el acceso a esta diligencia: '+diligenceError.message,'error');
+    d=diligence;
+  }
+  if(!d)return msg('No se encontró la diligencia o no tiene acceso a ella.','error');
+  const allowed=isAdmin()||(isEvaluator()&&String(d.evaluador_id)===String(user.id))||(isOperator()&&String(d.colaborador_id)===String(user.id));
+  if(!allowed)return msg('No tiene permiso para ver las fotos de esta diligencia.','error');
+  const {data,error}=await sb.from('diligencia_fotos').select('id,storage_path,nombre_archivo,created_at').eq('diligencia_id',String(id)).order('created_at',{ascending:true});
+  if(error)return msg('No se pudieron consultar las evidencias: '+error.message,'error');
+  let body='<p>No hay fotografías adjuntas a esta diligencia.</p>';
+  if(data?.length){const imgs=[];for(const photo of data){const {data:urlData,error:urlErr}=await sb.storage.from(PHOTO_BUCKET).createSignedUrl(photo.storage_path,300);if(!urlErr&&urlData?.signedUrl)imgs.push(`<a href="${urlData.signedUrl}" target="_blank" rel="noopener"><img src="${urlData.signedUrl}" alt="${esc(photo.nombre_archivo||'Evidencia fotográfica')}"><small>${esc(photo.nombre_archivo||'Fotografía')}</small></a>`)}body=imgs.length?`<div class="photo-grid">${imgs.join('')}</div>`:'<p>No fue posible generar los enlaces temporales de las fotografías.</p>'}
+  const old=$('diligencePhotoModal');if(old)old.remove();const modal=document.createElement('div');modal.id='diligencePhotoModal';modal.className='photo-modal';modal.innerHTML=`<div class="photo-modal-card"><div class="photo-modal-head"><h2>📷 Evidencias · Diligencia #${esc(id)}</h2><button class="btn secondary" type="button" id="closeDiligencePhotos">Cerrar</button></div>${body}</div>`;document.body.appendChild(modal);$('closeDiligencePhotos').onclick=()=>modal.remove();modal.onclick=e=>{if(e.target===modal)modal.remove()};
+};
+
 $('entryForm').onsubmit=async e=>{
   e.preventDefault();
   if(!sb||!user)return msg('Inicie sesión antes de guardar.','error');
@@ -740,10 +794,20 @@ $('entryForm').onsubmit=async e=>{
     viatico:Number($('viatico').value)||0,codigo:$('codigo').value.trim(),supervisor:$('supervisor').value.trim(),
     obs:$('obs').value.trim(),aprob:'Pendiente',created_by:user.id
   };
-  let q=editing?sb.from('diligencias').update(row).eq('id',editing):sb.from('diligencias').insert(row);
-  let {error}=await q;
-  if(error)return msg('No se pudo guardar: '+error.message,'error');
-  msg(editing?'Diligencia actualizada.':'Diligencia guardada en el sistema.','ok');resetForm();tab('listView');
+  const selectedPhotos=[...diligencePhotoFiles];
+  let savedId=editing;
+  if(editing){
+    const {error}=await sb.from('diligencias').update(row).eq('id',editing);
+    if(error)return msg('No se pudo guardar: '+error.message,'error');
+  }else{
+    const {data,error}=await sb.from('diligencias').insert(row).select('id').single();
+    if(error)return msg('No se pudo guardar: '+error.message,'error');
+    savedId=data.id;
+  }
+  if(selectedPhotos.length){
+    try{await uploadDiligencePhotos(savedId,selectedPhotos)}catch(err){msg('La diligencia se guardó, pero hubo un problema con las fotos: '+err.message,'error');await loadRecords();return;}
+  }
+  msg((editing?'Diligencia actualizada.':'Diligencia guardada en el sistema.')+(selectedPhotos.length?` ${selectedPhotos.length} foto(s) adjunta(s).`:''),'ok');resetForm();tab('listView');await loadRecords();
 };
 
 async function loadRecords(){
@@ -767,7 +831,7 @@ function render(){
     <p>${esc(x.colaborador)} · ${esc(x.salida)}–${esc(x.regreso)} · ${Number(x.hours||0).toFixed(2)} h</p>
     <p>Viático B/. ${money(x.viatico)} · Sobre B/. ${money(x.sobre)}</p>
     ${x.obs?`<p>${esc(x.obs)}</p>`:''}
-    ${isAdmin()?`<div class="entrybuttons"><button class="btn secondary" onclick="edit('${x.id}')">Editar</button>${x.aprob==='ANULADO'?'':`<button class="btn secondary" onclick="annul('${x.id}')">Anular</button>`}</div>`:''}
+    <div class="entrybuttons"><button class="btn secondary" type="button" onclick="showDiligencePhotos('${x.id}')">📷 Ver evidencias</button>${isAdmin()?`<button class="btn secondary" onclick="edit('${x.id}')">Editar</button>${x.aprob==='ANULADO'?'':`<button class="btn secondary" onclick="annul('${x.id}')">Anular</button>`}`:''}</div>
   </article>`).join(''):'<div class="empty">No hay registros para este filtro.</div>';
 }
 $('filterMonth').value=today().slice(0,7);$('evalMonth').value=today().slice(0,7);$('resultMonth').value=today().slice(0,7);$('fuelDate').value=today();
@@ -1231,7 +1295,7 @@ async function loadEvaluationData(){
   $('evaluationPendingList').innerHTML=pending.length?pending.map(d=>{
     const p=profiles.find(x=>String(x.id)===String(d.colaborador_id));
     const ev=profiles.find(x=>String(x.id)===String(d.evaluador_id));
-    return `<article class="entry"><div class="entrytop"><div><h3>Diligencia #${d.id} · ${esc(d.destino||'')}</h3><p>${esc(d.date||'')} · ${esc(p?.full_name||d.colaborador||'')} · ${esc(d.motivo||'')}</p></div><span class="pill">PENDIENTE</span></div><p>Evaluador asignado: ${esc(ev?.full_name||ev?.email||d.evaluador_id||'')}</p><div class="actions"><button class="btn primary" type="button" onclick="selectEvaluationDiligence(${d.id})">Evaluar</button></div></article>`;
+    return `<article class="entry"><div class="entrytop"><div><h3>Diligencia #${d.id} · ${esc(d.destino||'')}</h3><p>${esc(d.date||'')} · ${esc(p?.full_name||d.colaborador||'')} · ${esc(d.motivo||'')}</p></div><span class="pill">PENDIENTE</span></div><p>Evaluador asignado: ${esc(ev?.full_name||ev?.email||d.evaluador_id||'')}</p><div class="actions"><button class="btn secondary" type="button" onclick="showDiligencePhotos('${d.id}')">📷 Ver evidencias</button><button class="btn primary" type="button" onclick="selectEvaluationDiligence(${d.id})">Evaluar</button></div></article>`;
   }).join(''):'<div class="empty">No hay diligencias pendientes de evaluación para este período.</div>';
 
   const listRows=isAdmin()?visible:evaluated;
@@ -1239,7 +1303,7 @@ async function loadEvaluationData(){
     const x=evalByDiligence.get(String(d.id));
     const p=profiles.find(z=>String(z.id)===String(d.colaborador_id));
     const ev=profiles.find(z=>String(z.id)===String(x.evaluado_por));
-    return `<article class="entry"><div class="entrytop"><div><h3>Diligencia #${d.id} · ${esc(p?.full_name||d.colaborador||'')}</h3><p>${esc(d.date||'')} · ${esc(d.destino||'')} · ${esc(x.periodo||'')}</p></div><span class="pill">${Number(x.puntuacion).toFixed(2)}/100</span></div><p>Evaluador: ${esc(ev?.full_name||ev?.email||x.evaluado_por)}</p>${x.observaciones?`<p>${esc(x.observaciones)}</p>`:''}<p>Registrada: ${new Date(x.created_at).toLocaleString('es-PA')}</p>${isAdmin()?`<div class="actions"><button class="btn secondary" type="button" onclick="editEvaluation('${x.id}',${d.id})">Corregir evaluación</button></div>`:''}</article>`;
+    return `<article class="entry"><div class="entrytop"><div><h3>Diligencia #${d.id} · ${esc(p?.full_name||d.colaborador||'')}</h3><p>${esc(d.date||'')} · ${esc(d.destino||'')} · ${esc(x.periodo||'')}</p></div><span class="pill">${Number(x.puntuacion).toFixed(2)}/100</span></div><p>Evaluador: ${esc(ev?.full_name||ev?.email||x.evaluado_por)}</p><div class="actions"><button class="btn secondary" type="button" onclick="showDiligencePhotos('${d.id}')">📷 Ver evidencias</button></div>${x.observaciones?`<p>${esc(x.observaciones)}</p>`:''}<p>Registrada: ${new Date(x.created_at).toLocaleString('es-PA')}</p>${isAdmin()?`<div class="actions"><button class="btn secondary" type="button" onclick="editEvaluation('${x.id}',${d.id})">Corregir evaluación</button></div>`:''}</article>`;
   }).join('')||'<div class="empty">No hay evaluaciones registradas para este período.</div>';
 
   const performed=visible.length, evaluatedCount=evaluated.length, pendingCount=pending.length, coverage=performed?((evaluatedCount/performed)*100):0;

@@ -1523,9 +1523,19 @@ async function generateQuincenalReport(){
   ]);
   if(evaluationError)return msg('No se pudieron cargar las evaluaciones quincenales: '+evaluationError.message,'error');
   const evaluationRecords=(evaluacionesQuincena||[]).filter(x=>x.puntuacion!==null&&x.puntuacion!==undefined&&Number.isFinite(Number(x.puntuacion)));
+  const criterionKeys=['cumplimiento_diligencia','responsabilidad','comunicacion','uso_recursos'];
+  const averageCriteria={};
+  criterionKeys.forEach(key=>{
+    const values=evaluationRecords
+      .map(x=>Number(x.criterios?.[key]))
+      .filter(value=>Number.isFinite(value));
+    averageCriteria[key]=values.length
+      ? values.reduce((sum,value)=>sum+value,0)/values.length
+      : null;
+  });
   const evaluation=evaluationRecords.length?{
     puntuacion:evaluationRecords.reduce((sum,x)=>sum+Number(x.puntuacion),0)/evaluationRecords.length,
-    criterios:{},
+    criterios:averageCriteria,
     observaciones:'',
     total_registros:evaluationRecords.length
   }:null;
@@ -1564,11 +1574,11 @@ async function generateQuincenalReport(){
   const diligenceRows=validDiligencias.map(x=>{const fueEvaluada=idsDiligencias.has(String(x.id));const estadoEvaluacion=fueEvaluada?'Evaluada':'Pendiente de evaluación';return `<tr><td>${esc(x.date||'')}</td><td>${esc(x.destino||'')}</td><td>${esc(x.motivo||'')}</td><td class="num">${Number(x.hours||0).toFixed(2)}</td><td>${estadoEvaluacion}</td></tr>`}).join('')||`<tr><td colspan="5" style="text-align:center">No se registraron diligencias en la quincena.</td></tr>`;
   const evalRows=evaluation?`
     <tr><td>Promedio combinado de ${evaluation.total_registros} evaluación(es) de la quincena</td><td class="num">${Number(evaluation.puntuacion).toFixed(2)} / 100</td></tr>
-    <tr><td colspan="2">Se incluyen las evaluaciones registradas por los evaluadores autorizados durante este período.</td></tr>
-    <!-- Detalle por criterios no se presenta como si correspondiera a una sola evaluación -->
-    <tr><td>2. Responsabilidad</td><td class="num">${Number(evaluation.criterios?.responsabilidad??0).toFixed(2)}</td></tr>
-    <tr><td>3. Comunicación</td><td class="num">${Number(evaluation.criterios?.comunicacion??0).toFixed(2)}</td></tr>
-    <tr><td>4. Uso de recursos</td><td class="num">${Number(evaluation.criterios?.uso_recursos??0).toFixed(2)}</td></tr>
+    <tr><td colspan="2">Promedios por criterio calculados con las evaluaciones registradas durante este período.</td></tr>
+    <tr><td>1. Cumplimiento de diligencia (40%)</td><td class="num">${evaluation.criterios?.cumplimiento_diligencia==null?'—':Number(evaluation.criterios.cumplimiento_diligencia).toFixed(2)}</td></tr>
+    <tr><td>2. Responsabilidad (35%)</td><td class="num">${evaluation.criterios?.responsabilidad==null?'—':Number(evaluation.criterios.responsabilidad).toFixed(2)}</td></tr>
+    <tr><td>3. Comunicación (20%)</td><td class="num">${evaluation.criterios?.comunicacion==null?'—':Number(evaluation.criterios.comunicacion).toFixed(2)}</td></tr>
+    <tr><td>4. Uso de recursos (5%)</td><td class="num">${evaluation.criterios?.uso_recursos==null?'—':Number(evaluation.criterios.uso_recursos).toFixed(2)}</td></tr>
     <tr><td><strong>Puntuación quincenal</strong></td><td class="num"><strong>${Number(evaluation.puntuacion).toFixed(2)}</strong></td></tr>`
     :`<tr><td colspan="2" style="text-align:center">Evaluación pendiente para esta quincena.</td></tr>`;
   const fuelRows=(fuel||[]).map(x=>`<tr><td>${esc(x.fecha||'')}</td><td class="num">${Number(x.galones||0).toFixed(3)} gal</td><td class="num">B/. ${money(x.precio_galon)}</td><td class="num">B/. ${money(x.costo_total)}</td><td>${esc(x.tipo_carga||'')}</td></tr>`).join('')||`<tr><td colspan="5" style="text-align:center">No se registraron abastecimientos en la quincena.</td></tr>`;

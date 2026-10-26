@@ -335,10 +335,29 @@ textarea{min-height:72px}
     </div>
 
     <div class="tabs">
-      <button class="tab active" data-tab="formView">＋ Registrar</button>
+      <button class="tab active" data-tab="homeView">⌂ Inicio</button><button class="tab" data-tab="formView">＋ Registrar</button>
       <button class="tab" data-tab="listView">☷ Historial</button><button class="tab" data-tab="fuelView">⛽ Combustible</button>
       <button class="tab" data-tab="evaluationView">★ Evaluación</button><button class="tab" data-tab="incidentsView">⚠ Incidencias</button><button class="tab" data-tab="resultsView">◈ Resultados</button><button class="tab" data-tab="reportsView">📄 Reportes PDF</button><button class="tab" data-tab="exportView">⇧ Exportar</button><button class="tab" data-tab="settingsView">⚙ Configuración</button><button class="tab" data-tab="usersView">👥 Usuarios</button>
     </div>
+
+    <section id="homeView">
+      <div class="panel">
+        <h2>Resumen operativo</h2>
+        <p class="hint">Indicadores basados en las diligencias que puede consultar tu usuario.</p>
+        <div class="stats">
+          <div class="stat"><span>◆ Diligencias de hoy</span><strong id="homeTodayCount">0</strong></div>
+          <div class="stat"><span>▶ En curso</span><strong id="homeInProgress">0</strong></div>
+          <div class="stat"><span>✓ Finalizadas hoy</span><strong id="homeFinished">0</strong></div>
+          <div class="stat"><span>◷ Horas registradas hoy</span><strong id="homeHours">0.00</strong></div>
+        </div>
+        <div class="actions" style="margin-top:14px">
+          <button class="btn primary" type="button" id="homeRegister">＋ Registrar diligencia</button>
+          <button class="btn secondary" type="button" id="homeHistory">☷ Ver historial</button>
+          <button class="btn secondary" type="button" id="homeRefresh">↻ Actualizar resumen</button>
+        </div>
+      </div>
+      <div class="panel"><h2>Actividad reciente</h2><div id="homeRecent" class="entrylist"><div class="empty">Inicia sesión para consultar la actividad.</div></div></div>
+    </section>
 
     <section id="formView">
       <div class="panel">
@@ -353,8 +372,8 @@ textarea{min-height:72px}
             <div class="field"><label>Cargo</label><input id="cargo" value="Mensajero"></div>
             <div class="field full"><label>Destino / cliente *</label><input id="destino" required placeholder="Cliente o institución"></div>
             <div class="field full"><label>Motivo *</label><select id="motivo" required><option value="">Seleccionar…</option><option>Mensajería</option><option>Entrega de documentos</option><option>Entrega de formularios</option><option>Paquetería</option><option>Retiro</option><option>Retiro de carga</option><option>Trámites</option><option>Compras</option><option>Otro</option></select></div>
-            <div class="field"><label>Hora de salida *</label><input id="salida" type="time" required></div>
-            <div class="field"><label>Hora de regreso *</label><input id="regreso" type="time" required></div>
+            <div class="field"><label>Hora de salida (automática)</label><input id="salida" type="time" readonly placeholder="Se registra al pulsar COMIENZO"></div>
+            <div class="field"><label>Hora de regreso (automática)</label><input id="regreso" type="time" readonly placeholder="Se registra al finalizar"></div>
             <div class="field"><label>Sobre / efectivo (B/.)</label><input id="sobre" type="number" min="0" step=".01" value="0"></div>
             <div class="field"><label>Viático (B/.)</label><input id="viatico" type="number" min="0" step=".01" value="0"></div>
             <div class="field"><label>Código / referencia</label><input id="codigo"></div>
@@ -362,12 +381,17 @@ textarea{min-height:72px}
             <div class="field full"><label>Observaciones / resultado</label><textarea id="obs" placeholder="Resultado de la diligencia…"></textarea></div>
           </div>
           <div class="field full" style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#f8fafc">
-            <label for="diligencePhotos"><strong>📷 Evidencia fotográfica de la diligencia</strong></label>
+            <label><strong>📷 Evidencia fotográfica de la diligencia</strong></label>
             <p class="hint">Al registrar una diligencia, Jhonatan puede tomar o seleccionar varias fotos desde el móvil. Se guardarán asociadas a esta diligencia para consulta del administrador y del evaluador asignado.</p>
-            <input id="diligencePhotos" type="file" accept="image/*" capture="environment" multiple>
+            <div class="actions" style="margin:8px 0">
+              <button class="btn secondary" type="button" id="chooseCamera">📷 Tomar fotografía</button>
+              <button class="btn secondary" type="button" id="chooseGallery">🖼️ Elegir de galería</button>
+            </div>
+            <input id="diligenceCamera" type="file" accept="image/*" capture="environment" multiple hidden>
+            <input id="diligenceGallery" type="file" accept="image/*" multiple hidden>
             <div id="diligencePhotoPreview" class="hint" aria-live="polite">No hay fotos seleccionadas.</div>
           </div>
-          <p class="hint">La duración se calcula automáticamente. Si termina después de medianoche, se contempla el cambio de día.</p>
+          <p class="hint">Para registrar los tiempos, guarda primero la diligencia y luego usa COMIENZO y FINALIZAR desde el historial. La fecha y hora se guardan automáticamente.</p>
           <div class="actions"><button class="btn primary" type="submit">Guardar en sistema</button><button class="btn secondary" type="button" id="clear">Limpiar</button></div>
         </form>
       </div>
@@ -576,8 +600,9 @@ function money(n){return (Number(n)||0).toLocaleString('es-PA',{minimumFractionD
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function tab(id){
   if(!canUseTab(id)) return;
-  ['formView','listView','fuelView','evaluationView','incidentsView','resultsView','reportsView','exportView','settingsView','usersView'].forEach(x=>$(x).hidden=x!==id);
+  ['homeView','formView','listView','fuelView','evaluationView','incidentsView','resultsView','reportsView','exportView','settingsView','usersView'].forEach(x=>$(x).hidden=x!==id);
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  if(id==='homeView')refreshHome();
   if(id==='listView')loadRecords();
   if(id==='fuelView')loadFuelData();
   if(id==='evaluationView'){loadEvaluators();loadEvaluationData();}
@@ -595,6 +620,7 @@ function isAdmin(){return role()==='ADMIN' && isActive()}
 function isEvaluator(){return role()==='EVALUADOR' && isActive()}
 function isOperator(){return role()==='OPERADOR' && isActive()}
 function canUseTab(id){
+  if(id==='homeView') return isAdmin()||isOperator()||isEvaluator();
   if(id==='formView') return isAdmin()||isOperator();
   if(id==='listView') return isAdmin()||isOperator();
   if(id==='fuelView') return isAdmin()||isOperator();
@@ -632,8 +658,9 @@ function applyRolePermissions(){
   if(isOperator()){
     $('entryCollaborator').disabled=true;
   }
-  if(r==='EVALUADOR') tab('evaluationView');
-  if(r==='OPERADOR') tab('formView');
+  if(r==='EVALUADOR') tab('homeView');
+  if(r==='OPERADOR') tab('homeView');
+  if(isAdmin()) tab('homeView');
 }
 
 
@@ -688,7 +715,8 @@ function resetForm(){
   diligencePhotoFiles=[];
   diligencePhotoObjectUrls.forEach(url=>URL.revokeObjectURL(url));
   diligencePhotoObjectUrls=[];
-  if($('diligencePhotos')) $('diligencePhotos').value='';
+  if($('diligenceCamera')) $('diligenceCamera').value='';
+   if($('diligenceGallery')) $('diligenceGallery').value='';
   if($('diligencePhotoPreview')) $('diligencePhotoPreview').innerHTML='No hay fotos seleccionadas.';
   $('entryId').value='';editing=null;$('date').value=today();
   $('departamento').value='Mensajería';$('cargo').value='Mensajero';$('sobre').value='0';$('viatico').value='0';
@@ -709,7 +737,7 @@ async function showApp(){
     const name=currentProfile?.full_name||user?.email||'Usuario';
     $('sessionUser').innerHTML=`${esc(name)}<span>${esc(role||'USUARIO')} · Sesión activa</span>`;
   }
-  $('auth').hidden=true;$('app').hidden=false;msg('Sesión iniciada correctamente.','ok');resetForm();await loadProfiles();fillCollaboratorSelects();await loadEvaluators();applyRolePermissions();if(isAdmin())loadSettings();if(isAdmin()||isOperator())loadRecords();
+  $('auth').hidden=true;$('app').hidden=false;msg('Sesión iniciada correctamente.','ok');resetForm();await loadProfiles();fillCollaboratorSelects();await loadEvaluators();applyRolePermissions();if(isAdmin())loadSettings();if(isAdmin()||isOperator()){await loadRecords();await refreshHome();}else{await refreshHome();}
 }
 async function doLogin(){
   const email=$('email').value.trim(),password=$('password').value;
@@ -738,22 +766,25 @@ async function doLogout(){
 $('logoutTop').onclick=doLogout;
 
 
+// Requiere ejecutar la migración SQL adjunta antes de usar los botones de tiempo.
 const PHOTO_BUCKET='diligencia-evidencias';
 let diligencePhotoFiles=[];
 let diligencePhotoObjectUrls=[];
-$('diligencePhotos')?.addEventListener('change',e=>{
+$('chooseCamera')?.addEventListener('click',()=>$('diligenceCamera').click());
+$('chooseGallery')?.addEventListener('click',()=>$('diligenceGallery').click());
+function updatePhotoSelection(){
   diligencePhotoObjectUrls.forEach(url=>URL.revokeObjectURL(url));
   diligencePhotoObjectUrls=[];
-  diligencePhotoFiles=Array.from(e.target.files||[]);
-  const preview=$('diligencePhotoPreview');
-  if(!preview)return;
+  const camera=Array.from($('diligenceCamera')?.files||[]), gallery=Array.from($('diligenceGallery')?.files||[]);
+  const seen=new Set();
+  diligencePhotoFiles=[...camera,...gallery].filter(f=>{const k=[f.name,f.size,f.lastModified].join('|');if(seen.has(k))return false;seen.add(k);return true;});
+  const preview=$('diligencePhotoPreview'); if(!preview)return;
   if(!diligencePhotoFiles.length){preview.textContent='No hay fotos seleccionadas.';return;}
-  const items=diligencePhotoFiles.map(file=>{
-    const url=URL.createObjectURL(file);diligencePhotoObjectUrls.push(url);
-    return `<div class="photo-preview-item"><img src="${url}" alt="Vista previa de ${esc(file.name)}"><small>${esc(file.name)}</small></div>`;
-  }).join('');
-  preview.innerHTML=`<p><strong>${diligencePhotoFiles.length} foto(s) seleccionada(s).</strong> Vista previa de las imágenes que se adjuntarán al guardar la diligencia:</p><div class="photo-preview-grid">${items}</div>`;
-});
+  const items=diligencePhotoFiles.map(file=>{const url=URL.createObjectURL(file);diligencePhotoObjectUrls.push(url);return `<div class="photo-preview-item"><img src="${url}" alt="Vista previa de ${esc(file.name)}"><small>${esc(file.name)}</small></div>`;}).join('');
+  preview.innerHTML=`<p><strong>${diligencePhotoFiles.length} foto(s) seleccionada(s).</strong> Se adjuntarán al guardar la diligencia.</p><div class="photo-preview-grid">${items}</div>`;
+}
+$('diligenceCamera')?.addEventListener('change',updatePhotoSelection);
+$('diligenceGallery')?.addEventListener('change',updatePhotoSelection);
 async function uploadDiligencePhotos(diligenceId, files){
   if(!files?.length)return;
   for(const file of files){
@@ -824,8 +855,51 @@ async function loadRecords(){
   if(!sb||!user)return;
   let {data,error}=await sb.from('diligencias').select('*').order('date',{ascending:false}).limit(2000);
   if(error){msg('Error al consultar: '+error.message,'error');return}
-  records=data||[];render();msg(`Historial actualizado (${records.length} registros).`,'ok');
+  records=data||[];render();if($('homeView')&&!$('homeView').hidden)await refreshHome();msg(`Historial actualizado (${records.length} registros).`,'ok');
 }
+async function startDiligence(id){
+  if(!isOperator())return msg('Solo el operador asignado puede iniciar esta diligencia.','error');
+  const x=records.find(r=>String(r.id)===String(id));
+  if(!x||String(x.colaborador_id)!==String(user.id))return msg('No tienes permiso para iniciar esta diligencia.','error');
+  if(x.started_at)return msg('Esta diligencia ya tiene hora de comienzo registrada.','error');
+  if(x.finished_at)return msg('Esta diligencia ya está finalizada.','error');
+  if(!confirm('¿Confirmas que vas a COMENZAR esta diligencia ahora?'))return;
+  const now=new Date(), time=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+  const {data,error}=await sb.rpc('start_diligence',{p_id:Number(id)});
+  if(error)return msg('No se pudo registrar el comienzo: '+error.message,'error');
+  if(data?.ok===false)return msg(data.message||'No se pudo registrar el comienzo.','error');
+  msg('Comienzo registrado automáticamente.','ok');await loadRecords();await refreshHome();
+}
+async function finishDiligence(id){
+  if(!isOperator())return msg('Solo el operador asignado puede finalizar esta diligencia.','error');
+  const x=records.find(r=>String(r.id)===String(id));
+  if(!x||String(x.colaborador_id)!==String(user.id))return msg('No tienes permiso para finalizar esta diligencia.','error');
+  if(!x.started_at)return msg('Primero debes pulsar COMIENZO.','error');
+  if(x.finished_at)return msg('Esta diligencia ya está finalizada.','error');
+  if(!confirm('¿Confirmas que deseas FINALIZAR esta diligencia?'))return;
+  const now=new Date(), time=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false});
+  const hours=Number(((now.getTime()-new Date(x.started_at).getTime())/3600000).toFixed(2));
+  if(hours<0)return msg('La hora de finalización no puede ser anterior al comienzo.','error');
+  const {data,error}=await sb.rpc('finish_diligence',{p_id:Number(id)});
+  if(error)return msg('No se pudo finalizar la diligencia: '+error.message,'error');
+  if(data?.ok===false)return msg(data.message||'No se pudo finalizar la diligencia.','error');
+  msg('Diligencia finalizada. Duración registrada: '+Number(data.hours||hours).toFixed(2)+' h.','ok');await loadRecords();await refreshHome();
+}
+async function refreshHome(){
+  if(!user)return;
+  if(isAdmin()||isOperator()){
+    if(!records.length){const {data,error}=await sb.from('diligencias').select('*').order('date',{ascending:false}).limit(2000);if(error){$('homeRecent').innerHTML='<div class="empty">No se pudo cargar el resumen.</div>';return;}records=data||[];}
+  } else {
+    const {data,error}=await sb.from('diligencias').select('*').order('date',{ascending:false}).limit(2000);
+    if(error){$('homeRecent').innerHTML='<div class="empty">No se pudo cargar el resumen de diligencias asignadas.</div>';return;}records=data||[];
+  }
+  const todayStr=today(), todays=records.filter(x=>x.date===todayStr), running=todays.filter(x=>x.operational_status==='EN_CURSO'), finished=todays.filter(x=>x.operational_status==='FINALIZADA');
+  $('homeTodayCount').textContent=todays.length;$('homeInProgress').textContent=running.length;$('homeFinished').textContent=finished.length;$('homeHours').textContent=todays.reduce((a,x)=>a+Number(x.hours||0),0).toFixed(2);
+  const recent=[...records].sort((a,b)=>String(b.started_at||b.date||'').localeCompare(String(a.started_at||a.date||''))).slice(0,5);
+  $('homeRecent').innerHTML=recent.length?recent.map(x=>`<article class="entry"><div class="entrytop"><div><h3>${esc(x.destino||'Diligencia')}</h3><p>${esc(x.date||'')} · ${esc(x.colaborador||'')}</p></div><span class="pill">${esc(x.operational_status||'PENDIENTE')}</span></div><p>${esc(x.motivo||'')} · ${Number(x.hours||0).toFixed(2)} h</p></article>`).join(''):'<div class="empty">No hay diligencias disponibles para mostrar.</div>';
+}
+$('homeRegister').onclick=()=>tab('formView');$('homeHistory').onclick=()=>tab('listView');$('homeRefresh').onclick=async()=>{await loadRecords();await refreshHome();};
+
 function filtered(){
   let m=$('filterMonth').value,n=$('filterName').value.trim().toLowerCase();
   return records.filter(x=>(!m||x.month===m)&&(!n||(x.colaborador||'').toLowerCase().includes(n)));
@@ -838,10 +912,11 @@ function render(){
   $('entries').innerHTML=rows.length?rows.map(x=>`<article class="entry">
     <div class="entrytop"><div><h3>${esc(x.destino)}</h3><p>${esc(x.date)} · ${esc(x.motivo)}</p></div>
     <span class="pill ${x.aprob==='Pendiente'?'pending':''}">${esc(x.aprob||'Pendiente')}</span></div>
-    <p>${esc(x.colaborador)} · ${esc(x.salida)}–${esc(x.regreso)} · ${Number(x.hours||0).toFixed(2)} h</p>
+    <p>${esc(x.colaborador)} · ${esc(x.salida||'—')}–${esc(x.regreso||'En curso')} · ${Number(x.hours||0).toFixed(2)} h</p>
+    <p>Estado operativo: <strong>${esc(x.operational_status||'PENDIENTE')}</strong>${x.started_at?` · Comienzo: ${esc(new Date(x.started_at).toLocaleString('es-PA'))}`:''}${x.finished_at?` · Final: ${esc(new Date(x.finished_at).toLocaleString('es-PA'))}`:''}</p>
     <p>Viático B/. ${money(x.viatico)} · Sobre B/. ${money(x.sobre)}</p>
     ${x.obs?`<p>${esc(x.obs)}</p>`:''}
-    <div class="entrybuttons"><button class="btn secondary" type="button" onclick="showDiligencePhotos('${x.id}')">📷 Ver evidencias</button>${isAdmin()?`<button class="btn secondary" onclick="edit('${x.id}')">Editar</button>${x.aprob==='ANULADO'?'':`<button class="btn secondary" onclick="annul('${x.id}')">Anular</button>`}`:''}</div>
+    <div class="entrybuttons">${isOperator()&&String(x.colaborador_id)===String(user.id)&&!x.started_at&&x.aprob!=='ANULADO'?`<button class="btn primary" type="button" onclick="startDiligence('${x.id}')">▶ COMIENZO</button>`:''}${isOperator()&&String(x.colaborador_id)===String(user.id)&&x.started_at&&!x.finished_at?`<button class="btn gold" type="button" onclick="finishDiligence('${x.id}')">✓ FINALIZAR DILIGENCIA</button>`:''}<button class="btn secondary" type="button" onclick="showDiligencePhotos('${x.id}')">📷 Ver evidencias</button>${isAdmin()?`<button class="btn secondary" onclick="edit('${x.id}')">Editar</button>${x.aprob==='ANULADO'?'':`<button class="btn secondary" onclick="annul('${x.id}')">Anular</button>`}`:''}</div>
   </article>`).join(''):'<div class="empty">No hay registros para este filtro.</div>';
 }
 $('filterMonth').value=today().slice(0,7);$('evalMonth').value=today().slice(0,7);$('resultMonth').value=today().slice(0,7);$('fuelDate').value=today();
@@ -1633,7 +1708,7 @@ $('exportJson').onclick=async()=>{
   evaluations=ev||[];
   download(JSON.stringify({version:5,exportedAt:new Date().toISOString(),data:{entries:data,evaluations,reportSettings:{empresa:'PANLOGISTICS GROUP, S.A.'}}},null,2),'application/json',`Panlogistics_Respaldo_${today()}.json`)
 };
-$('exportCsv').onclick=()=>{let cols=['date','colaborador','departamento','cargo','destino','motivo','salida','regreso','hours','sobre','viatico','codigo','supervisor','obs','aprob'];download('\ufeff'+[cols.join(';'),...filtered().map(x=>cols.map(k=>'"'+String(x[k]??'').replace(/"/g,'""')+'"').join(';'))].join('\r\n'),'text/csv;charset=utf-8',`Panlogistics_Diligencias_${today()}.csv`)};
+$('exportCsv').onclick=()=>{let cols=['date','colaborador','departamento','cargo','destino','motivo','salida','regreso','started_at','finished_at','operational_status','hours','sobre','viatico','codigo','supervisor','obs','aprob'];download('\ufeff'+[cols.join(';'),...filtered().map(x=>cols.map(k=>'"'+String(x[k]??'').replace(/"/g,'""')+'"').join(';'))].join('\r\n'),'text/csv;charset=utf-8',`Panlogistics_Diligencias_${today()}.csv`)};
 
 $('importBtn').onclick=async()=>{
   let f=$('importFile').files[0];if(!f)return msg('Selecciona un archivo JSON.','error');

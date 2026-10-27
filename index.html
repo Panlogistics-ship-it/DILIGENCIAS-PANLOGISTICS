@@ -424,6 +424,20 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 #app>.topbar #logoutTop:hover{filter:brightness(1.04)}
 @media(max-width:700px){#app>.app-brand-header{padding:17px 16px!important}#app>.app-brand-header h1{font-size:clamp(25px,6vw,34px)!important;line-height:1.12!important}#app>.app-brand-header p{font-size:13px!important}}
 
+
+.dash-bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.dash-mini{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.97);border:1px solid #e3e9ed;border-radius:14px;padding:14px;min-width:0}
+.dash-mini .kpi-icon{width:42px;height:42px;flex:0 0 42px;border-radius:50%;display:grid;place-items:center;background:#e5f6f1;font-size:20px}
+.dash-mini strong{font-size:22px;display:block}
+.dash-mini small{font-size:11px;color:#68798a}
+.dash-mini-action{font:inherit;text-align:left;color:var(--ink);cursor:pointer;width:100%;border:1px solid #e3e9ed;transition:transform .15s ease,box-shadow .15s ease;background:rgba(255,255,255,.98)}
+.dash-mini-action:hover,.dash-mini-action:focus-visible{transform:translateY(-2px);box-shadow:0 8px 22px #10223618;outline:2px solid #078454;outline-offset:2px}
+.dash-mini-action .eval-icon{background:#fff2d9;color:#d28b12}
+.dash-mini-action .alert-icon{background:#ffebea;color:#d83c32}
+.dash-bottom-secondary{margin-top:12px}
+@media(max-width:1050px){.dash-bottom{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-bottom .dash-mini:last-child{grid-column:1/-1}}
+@media(max-width:700px){.dash-bottom,.dash-bottom-secondary{grid-template-columns:minmax(0,1fr);gap:8px}.dash-bottom .dash-mini:last-child{grid-column:auto}.dash-mini{min-width:0;box-sizing:border-box}}
+
 </style>
 </head>
 <body>
@@ -496,6 +510,11 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
         <div class="dash-panel"><h3>Últimas diligencias <button class="btn secondary" style="float:right;padding:5px 9px;min-height:30px" type="button" onclick="tab('listView')">Ver historial</button></h3><div class="dash-table-wrap"><table class="dash-table"><thead><tr><th>Fecha</th><th>Destino</th><th>Colaborador</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="dashRecentRows"><tr><td colspan="5">Cargando diligencias…</td></tr></tbody></table></div></div>
       </div>
       <div class="dash-bottom">
+        <button class="dash-mini dash-mini-action" type="button" onclick="tab('fuelView')"><span class="kpi-icon">⛽</span><div><small>Combustible</small><strong id="dashFuelCount">—</strong><small id="dashFuelNote">Registros de combustible · Ver módulo</small></div></button>
+        <button class="dash-mini dash-mini-action" type="button" onclick="tab('evaluationView')"><span class="kpi-icon eval-icon">★</span><div><small>Evaluaciones pendientes</small><strong id="dashEvalPending">—</strong><small>Por revisar · Ver evaluaciones</small></div></button>
+        <button class="dash-mini dash-mini-action" type="button" onclick="tab('incidentsView')"><span class="kpi-icon alert-icon">🔔</span><div><small>Alertas</small><strong id="dashAlertsCount">—</strong><small id="dashAlertsNote">Incidencias abiertas · Ver alertas</small></div></button>
+      </div>
+      <div class="dash-bottom dash-bottom-secondary">
         <div class="dash-mini"><span class="kpi-icon">◷</span><div><small>Horas registradas</small><strong id="dashHours">0.00</strong><small>Horas acumuladas</small></div></div>
         <div class="dash-mini"><span class="kpi-icon">＄</span><div><small>Viáticos registrados</small><strong id="dashAllowance">B/. 0.00</strong><small>Total de registros cargados</small></div></div>
         <div class="dash-mini"><span class="kpi-icon">▣</span><div><small>Acceso al sistema</small><strong style="font-size:16px">Seguro y autorizado</strong><small>Permisos según el rol del usuario</small></div></div>
@@ -1076,11 +1095,42 @@ $('formFinishBtn')?.addEventListener('click',async()=>{
   updateFormOperationalButtons();
 });
 
+async function loadDashboardExtras(){
+  if(!sb||!user)return;
+  const put=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
+  try{
+    let fuelQuery=sb.from('combustible').select('id',{count:'exact',head:true});
+    if(!isAdmin())fuelQuery=fuelQuery.eq('colaborador_id',user.id);
+    const fuelResult=await fuelQuery;
+    put('dashFuelCount',fuelResult.error?'—':String(fuelResult.count??0));
+    put('dashFuelNote',fuelResult.error?'No disponible para este rol':'Registros cargados · Abrir combustible');
+  }catch(_){put('dashFuelCount','—');}
+  try{
+    const [dRes,eRes]=await Promise.all([
+      sb.from('diligencias').select('id,evaluador_id,colaborador_id,aprob'),
+      sb.from('evaluaciones').select('diligencia_id')
+    ]);
+    if(dRes.error||eRes.error)put('dashEvalPending','—');
+    else{
+      const evaluated=new Set((eRes.data||[]).map(x=>String(x.diligencia_id)));
+      const eligible=(dRes.data||[]).filter(d=>String(d.aprob||'').toUpperCase()!=='ANULADO'&&(!isEvaluator()||String(d.evaluador_id)===String(user.id))&&(!isOperator()||String(d.colaborador_id)===String(user.id)));
+      put('dashEvalPending',String(eligible.filter(d=>!evaluated.has(String(d.id))).length));
+    }
+  }catch(_){put('dashEvalPending','—');}
+  try{
+    let incidentsQuery=sb.from('incidencias').select('id,estado',{count:'exact'}).not('estado','eq','CERRADA');
+    const incidentResult=await incidentsQuery;
+    put('dashAlertsCount',incidentResult.error?'—':String(incidentResult.count??(incidentResult.data||[]).length));
+    put('dashAlertsNote',incidentResult.error?'No disponible para este rol':'Incidencias abiertas · Abrir alertas');
+  }catch(_){put('dashAlertsCount','—');}
+}
+
+
 async function loadRecords(){
   if(!sb||!user)return;
   let {data,error}=await sb.from('diligencias').select('*').order('date',{ascending:false}).limit(2000);
   if(error){msg('Error al consultar: '+error.message,'error');return}
-  records=data||[];render();renderDashboard();updateFormOperationalButtons();msg(`Historial actualizado (${records.length} registros).`,'ok');
+  records=data||[];render();renderDashboard();loadDashboardExtras();updateFormOperationalButtons();msg(`Historial actualizado (${records.length} registros).`,'ok');
 }
 function renderDashboard(){
   const all=records||[];const now=today();const active=all.filter(x=>String(x.aprob||'').toUpperCase()!=='ANULADO');

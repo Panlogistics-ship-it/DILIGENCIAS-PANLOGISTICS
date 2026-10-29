@@ -60,6 +60,16 @@ textarea{min-height:72px}
 .kpi{background:white;border:1px solid var(--line);border-radius:12px;padding:12px}
 .kpi span{display:block;font-size:11px;color:var(--muted)}
 .kpi strong{display:block;font-size:20px;margin-top:2px}
+.bonus-kpi{background:linear-gradient(135deg,#fff9e8 0%,#fff0c2 100%);border:2px solid #e7b94e;border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(122,87,14,.08)}
+.bonus-kpi span{display:block;font-size:12px;font-weight:800;color:#7a570e}
+.bonus-kpi strong{display:block;font-size:30px;line-height:1.1;margin-top:5px;color:#704b00;font-weight:900}
+.bonus-kpi small{display:block;margin-top:6px;color:#775d25;font-size:11px}
+@media(max-width:680px){.bonus-dashboard-grid{grid-template-columns:1fr!important}.bonus-kpi strong{font-size:26px}}
+.report-bonus{border:2px solid #e1b642;border-radius:10px;padding:10px;text-align:center;background:linear-gradient(135deg,#fff9e8,#ffefbd)}
+.report-bonus span{font-size:9px;text-transform:uppercase;color:#775714;font-weight:800;display:block}
+.report-bonus strong{display:block;font-size:34px;color:#704b00;font-weight:900;line-height:1.05;margin-top:5px}
+.report-bonus small{font-size:9px;color:#775d25;display:block;margin-top:4px}
+
 .result-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .component{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:9px;background:#fff}
 .component-head{display:flex;justify-content:space-between;gap:8px;font-weight:800}
@@ -125,7 +135,7 @@ textarea{min-height:72px}
 .report-table td.num{text-align:right;font-variant-numeric:tabular-nums}
 .report-table tbody tr:nth-child(even){background:#fbfcfd}
 .report-table td:last-child{font-weight:700}
-.report-total{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;align-items:stretch;margin-top:12px}
+.report-total{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:10px;align-items:stretch;margin-top:12px}
 .report-score{border:2px solid #17294a;border-radius:10px;padding:10px;text-align:center;background:linear-gradient(135deg,#f4f8fd,#e8f1fb)}
 .report-score span{font-size:9px;text-transform:uppercase;color:#53657e;font-weight:700}
 .report-score strong{display:block;font-size:34px;color:#17294a;font-weight:900;line-height:1.05;margin-top:5px}
@@ -243,6 +253,9 @@ textarea{min-height:72px}
 
 /* Reporte legible en móvil: se adapta al ancho sin desplazamiento horizontal */
 @media screen and (max-width: 680px) {
+  .report-total{grid-template-columns:1fr;}
+  .report-score strong,.report-bonus strong{font-size:28px;}
+
   #reportPreview, .report-preview-wrap { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
   .report-preview-wrap { padding:6px!important; margin-top:10px!important; overflow-x:hidden!important; overflow-y:visible!important; }
   .report-page { width:100%!important; max-width:100%!important; min-height:0!important; margin:0!important; padding:12px!important; box-sizing:border-box!important; overflow-wrap:anywhere; box-shadow:none!important; }
@@ -505,6 +518,13 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
         <div class="dash-mini"><span class="kpi-icon">＄</span><div><small>Viáticos registrados</small><strong id="dashAllowance">B/. 0.00</strong><small>Total de registros cargados</small></div></div>
         <div class="dash-mini"><span class="kpi-icon">▣</span><div><small>Acceso al sistema</small><strong style="font-size:16px">Seguro y autorizado</strong><small>Permisos según el rol del usuario</small></div></div>
       </div>
+      <section class="bonus-dashboard panel" style="margin-top:16px;border:2px solid #e7b94e;background:linear-gradient(120deg,#fffdf6,#fff3cc);border-radius:16px;padding:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px"><div><h2 style="margin:0;color:#17334d">🏅 Rendimiento y bono de productividad</h2><p id="dashBonusPeriod" class="hint" style="margin:4px 0 0">Jhonatan Valencia · Bono calculado según la evaluación quincenal</p></div><button class="btn secondary" type="button" onclick="tab('reportsView')">Ver reporte quincenal</button></div>
+        <div class="bonus-dashboard-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+          <div class="bonus-kpi"><span>★ Puntuación quincenal</span><strong id="dashBonusScore">—</strong><small>Promedio de la evaluación de la quincena</small></div>
+          <div class="bonus-kpi"><span>💰 Bono de productividad</span><strong id="dashBonusAmount">—</strong><small>100% = B/. 75.00 por quincena</small></div>
+        </div>
+      </section>
     </section>
 
     <section id="formView">
@@ -1188,11 +1208,33 @@ async function loadDashboardExtras(){
 }
 
 
+async function loadProductivityBonusDashboard(){
+  const scoreEl=$('dashBonusScore'), amountEl=$('dashBonusAmount'), periodEl=$('dashBonusPeriod');
+  if(!scoreEl||!amountEl||!periodEl||!user)return;
+  const todayDate=today(), parts=todayDate.split('-').map(Number), year=parts[0], month=parts[1], day=parts[2];
+  const period=day<=15?'1-15':'16-FIN', periodLabel=day<=15?'1 al 15':'16 al '+new Date(year,month,0).getDate();
+  periodEl.textContent=`Jhonatan Valencia · ${periodLabel} de ${String(month).padStart(2,'0')}/${year}`;
+  scoreEl.textContent='—'; amountEl.textContent='Pendiente';
+  try{
+    await loadProfiles();
+    const targetProfile=(profiles||[]).find(p=>/jhonatan\s+valencia/i.test(String(p.full_name||'')));
+    if(!targetProfile){scoreEl.textContent='Sin perfil';amountEl.textContent='—';return;}
+    const {data,error}=await sb.from('evaluaciones').select('puntuacion').eq('anio',year).eq('mes',month).eq('colaborador_id',targetProfile.id).eq('periodo',period);
+    if(error)throw error;
+    const scores=(data||[]).map(x=>Number(x.puntuacion)).filter(x=>Number.isFinite(x));
+    if(!scores.length){scoreEl.textContent='Pendiente';amountEl.textContent='Pendiente';return;}
+    const score=scores.reduce((sum,x)=>sum+x,0)/scores.length;
+    const bonus=Math.max(0,Math.min(100,score))/100*75;
+    scoreEl.textContent=score.toFixed(2)+'%';
+    amountEl.textContent='B/. '+money(bonus);
+  }catch(err){scoreEl.textContent='No disponible';amountEl.textContent='No disponible';console.error('No se pudo calcular el bono quincenal',err);}
+}
+
 async function loadRecords(){
   if(!sb||!user)return;
   let {data,error}=await sb.from('diligencias').select('*').order('date',{ascending:false}).limit(2000);
   if(error){msg('Error al consultar: '+error.message,'error');return}
-  records=data||[];render();renderDashboard();loadDashboardExtras();updateFormOperationalButtons();msg(`Historial actualizado (${records.length} registros).`,'ok');
+  records=data||[];render();renderDashboard();loadDashboardExtras();loadProductivityBonusDashboard();updateFormOperationalButtons();msg(`Historial actualizado (${records.length} registros).`,'ok');
 }
 function renderDashboard(){
   const all=records||[];const now=today();const active=all.filter(x=>String(x.aprob||'').toUpperCase()!=='ANULADO');
@@ -1841,7 +1883,9 @@ async function loadResultData(){
     const points=available.reduce((a,c)=>a+c.score*c.weight/100,0);
     const productivity=availableWeight?available.reduce((a,c)=>a+c.score*c.weight,0)/availableWeight:null;
     const status=availableWeight===100?'COMPLETO':'PROVISIONAL';
-    return {profile,name,count,target,compliance,efficiency,fuelCost,productivity,points,status,availableWeight,components,periodLabel,evaluationCount:profileEvaluations.length};
+    const isJhonatan=/jhonatan\s+valencia/i.test(name);
+    const bonus=isJhonatan&&evaluation?Math.max(0,Math.min(100,Number(evaluation.puntuacion)))/100*75:null;
+    return {profile,name,count,target,compliance,efficiency,fuelCost,productivity,points,status,availableWeight,components,periodLabel,evaluationCount:profileEvaluations.length,bonus,isJhonatan};
   });
   $('resultsContent').innerHTML=rows.map(r=>{
     const prod=r.productivity;
@@ -1855,6 +1899,7 @@ async function loadResultData(){
         <div class="kpi"><span>Cumplimiento de meta</span><strong>${r.compliance===null?'Pendiente':r.compliance.toFixed(2)+'%'}</strong></div>
         <div class="kpi"><span>Peso disponible</span><strong>${r.availableWeight}%</strong></div>
       </div>
+      ${r.isJhonatan?`<div class="bonus-kpi" style="margin:10px 0 14px"><span>💰 Bono de productividad · Quincena ${esc(r.periodLabel)}</span><strong>${r.bonus===null?'Pendiente de evaluación':'B/. '+money(r.bonus)}</strong><small>Evaluación: ${r.bonus===null?'sin puntuación disponible':Number(r.evaluationCount? r.components[1].score||0:0).toFixed(2)+'%'} · 100% = B/. 75.00</small></div>`:''}
       <div class="cone-wrap">
         <div class="cone-panel">
           <div class="cone-title">Nivel de productividad</div>
@@ -1940,6 +1985,8 @@ async function generateQuincenalReport(){
   if(dErr)return msg('No se pudieron cargar las diligencias del reporte: '+dErr.message,'error');
   if(fErr)return msg('No se pudo cargar combustible del reporte: '+fErr.message,'error');
 
+  const isJhonatan=/jhonatan\s+valencia/i.test(name);
+  const productivityBonus=isJhonatan&&evaluation?Math.max(0,Math.min(100,Number(evaluation.puntuacion)))/100*75:null;
   const settings={};(appSettings||[]).forEach(x=>settings[x.key]=x.value);
   const target=Number(settings.meta_diligencias_quincenal||0)||null;
   const validDiligencias=(diligencias||[]).filter(x=>String(x.aprob||'').toUpperCase()!=='ANULADO'), count=validDiligencias.length;
@@ -2006,7 +2053,8 @@ async function generateQuincenalReport(){
     <div class="report-total">
       <div class="report-note"><strong>Resultado:</strong> ${points.toFixed(2)} puntos disponibles en la quincena. La productividad se calcula con los componentes disponibles y permanece <strong>${status}</strong> mientras existan componentes pendientes.
       ${fuelControl===null&&fuel.length?`<br><br><strong>Combustible:</strong> se registraron B/. ${money(fuelCost)}; el objetivo de costo por diligencia aún no está configurado.`:''}</div>
-      <div class="report-score"><span>Resultado quincenal</span><strong>${productivity===null?'—':productivity.toFixed(2)}</strong><small>/ 100 puntos</small></div>
+      <div class="report-score"><span>Resultado quincenal</span><strong>${productivity===null?'—':productivity.toFixed(2)}</strong><small>/ 100 puntos de productividad</small></div>
+      ${isJhonatan?`<div class="report-bonus"><span>💰 Bono de productividad</span><strong>${productivityBonus===null?'—':'B/. '+money(productivityBonus)}</strong><small>${productivityBonus===null?'Pendiente de evaluación':'100% = B/. 75.00 · '+Number(evaluation.puntuacion).toFixed(2)+'% de evaluación'}</small></div>`:`<div class="report-score"><span>Resultado quincenal</span><strong>${productivity===null?'—':productivity.toFixed(2)}</strong><small>/ 100 puntos</small></div>`}
     </div>
     <div class="report-section-title">Diligencias realizadas</div>
     <table class="report-table"><thead><tr><th>Fecha</th><th>Destino / cliente</th><th>Motivo</th><th>Horas</th><th>Estado de evaluación</th></tr></thead><tbody>${diligenceRows}</tbody></table>

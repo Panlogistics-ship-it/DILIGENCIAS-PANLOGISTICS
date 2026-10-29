@@ -424,20 +424,6 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 #app>.topbar #logoutTop:hover{filter:brightness(1.04)}
 @media(max-width:700px){#app>.app-brand-header{padding:17px 16px!important}#app>.app-brand-header h1{font-size:clamp(25px,6vw,34px)!important;line-height:1.12!important}#app>.app-brand-header p{font-size:13px!important}}
 
-
-.dash-bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.dash-mini{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.97);border:1px solid #e3e9ed;border-radius:14px;padding:14px;min-width:0}
-.dash-mini .kpi-icon{width:42px;height:42px;flex:0 0 42px;border-radius:50%;display:grid;place-items:center;background:#e5f6f1;font-size:20px}
-.dash-mini strong{font-size:22px;display:block}
-.dash-mini small{font-size:11px;color:#68798a}
-.dash-mini-action{font:inherit;text-align:left;color:var(--ink);cursor:pointer;width:100%;border:1px solid #e3e9ed;transition:transform .15s ease,box-shadow .15s ease;background:rgba(255,255,255,.98)}
-.dash-mini-action:hover,.dash-mini-action:focus-visible{transform:translateY(-2px);box-shadow:0 8px 22px #10223618;outline:2px solid #078454;outline-offset:2px}
-.dash-mini-action .eval-icon{background:#fff2d9;color:#d28b12}
-.dash-mini-action .alert-icon{background:#ffebea;color:#d83c32}
-.dash-bottom-secondary{margin-top:12px}
-@media(max-width:1050px){.dash-bottom{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-bottom .dash-mini:last-child{grid-column:1/-1}}
-@media(max-width:700px){.dash-bottom,.dash-bottom-secondary{grid-template-columns:minmax(0,1fr);gap:8px}.dash-bottom .dash-mini:last-child{grid-column:auto}.dash-mini{min-width:0;box-sizing:border-box}}
-
 </style>
 </head>
 <body>
@@ -546,7 +532,7 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
           </div>
           <div class="field full form-operational-box" style="margin-top:14px;padding:16px;border:1px solid #c9d9d2;border-radius:14px;background:#f0f8f4">
             <h3 style="margin:0 0 6px;color:#073b2c">Control de la diligencia</h3>
-            <p class="hint" style="margin:0 0 12px">1. Guarda primero los datos. 2. Pulsa COMIENZO al salir. 3. Toma fotos o selecciónalas de la galería. 4. Pulsa FINALIZAR DILIGENCIA al regresar.</p>
+            <p class="hint" style="margin:0 0 12px">1. Completa los datos. 2. Pulsa COMIENZO al salir. 3. Toma fotos o selecciónalas de la galería. 4. Pulsa FINALIZAR DILIGENCIA al regresar para guardar todo.</p>
             <div class="form-operational-actions">
               <button class="btn primary" id="formStartBtn" type="button" disabled>▶ COMIENZO</button>
               <button class="btn gold" id="formFinishBtn" type="button" disabled>■ FINALIZAR DILIGENCIA</button>
@@ -555,7 +541,7 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
           </div>
           <div class="field full" style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.98)">
             <label for="diligencePhotos"><strong>📷 Evidencia fotográfica de la diligencia</strong></label>
-            <p class="hint">Al registrar una diligencia, Jhonatan puede tomar o seleccionar varias fotos desde el móvil. Se guardarán asociadas a esta diligencia para consulta del administrador y del evaluador asignado.</p>
+            <p class="hint">Al registrar una diligencia, Jhonatan puede tomar o seleccionar varias fotos desde el móvil. Se guardarán asociadas a esta diligencia para consulta del administrador y del evaluador asignado. Puedes eliminar una foto equivocada antes de finalizar.</p>
             <div class="photo-pick-actions" style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
               <button class="btn primary" type="button" id="takeDiligencePhoto">📷 Tomar foto con la cámara</button>
               <button class="btn secondary" type="button" id="chooseDiligencePhotos">🖼️ Elegir de la galería</button>
@@ -564,8 +550,15 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
             <input id="diligenceGalleryPhotos" type="file" accept="image/*" multiple hidden>
             <div id="diligencePhotoPreview" class="hint" aria-live="polite">No hay fotos seleccionadas.</div>
           </div>
+          <div class="field full" style="margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.98)">
+            <label for="clientSignatureCanvas"><strong>✍️ Firma del cliente</strong></label>
+            <p class="hint">Pide al cliente que firme dentro del recuadro usando el dedo en el celular o el mouse en la computadora.</p>
+            <canvas id="clientSignatureCanvas" aria-label="Área para la firma del cliente" style="display:block;width:100%;height:180px;background:#fff;border:2px dashed #9fb5ad;border-radius:10px;touch-action:none;cursor:crosshair;pointer-events:auto;user-select:none;-webkit-user-select:none"></canvas>
+            <div class="actions" style="margin-top:8px"><button class="btn secondary" type="button" id="clearClientSignature">Borrar firma</button></div>
+            <p id="signatureHint" class="hint" aria-live="polite">Firma pendiente. La firma se adjuntará a la diligencia al finalizar.</p>
+          </div>
           <p class="hint">La duración se calcula automáticamente. Si termina después de medianoche, se contempla el cambio de día.</p>
-          <div class="actions"><button class="btn primary" type="submit">Guardar en sistema</button><button class="btn secondary" type="button" id="clear">Limpiar</button></div>
+          <div class="actions"><button class="btn secondary" type="button" id="clear">Limpiar formulario</button></div>
         </form>
       </div>
     </section>
@@ -889,6 +882,7 @@ function resetForm(){
   diligencePhotoObjectUrls=[];
   if($('diligencePhotos')) $('diligencePhotos').value=''; if($('diligenceGalleryPhotos')) $('diligenceGalleryPhotos').value='';
   if($('diligencePhotoPreview')) $('diligencePhotoPreview').innerHTML='No hay fotos seleccionadas.';
+  clearClientSignature();
   $('entryId').value='';editing=null;activeFormDiligenceId=null;$('date').value=today();
   updateFormOperationalButtons();
   $('departamento').value='Mensajería';$('cargo').value='Mensajero';$('sobre').value='0';$('viatico').value='0';
@@ -948,18 +942,32 @@ $('chooseDiligencePhotos')?.addEventListener('click',()=>galleryInput?.click());
 function updatePhotoSelection(){
   diligencePhotoObjectUrls.forEach(url=>URL.revokeObjectURL(url));
   diligencePhotoObjectUrls=[];
-  diligencePhotoFiles=[...Array.from(cameraInput?.files||[]),...Array.from(galleryInput?.files||[])];
   const preview=$('diligencePhotoPreview');
   if(!preview)return;
   if(!diligencePhotoFiles.length){preview.textContent='No hay fotos seleccionadas.';return;}
-  const items=diligencePhotoFiles.map(file=>{
+  const items=diligencePhotoFiles.map((file,index)=>{
     const url=URL.createObjectURL(file);diligencePhotoObjectUrls.push(url);
-    return `<div class="photo-preview-item"><img src="${url}" alt="Vista previa de ${esc(file.name)}"><small>${esc(file.name)}</small></div>`;
+    return `<div class="photo-preview-item"><img src="${url}" alt="Vista previa de ${esc(file.name)}"><small>${esc(file.name)}</small><button class="btn danger" type="button" style="margin-top:6px;padding:5px 9px;min-height:30px" onclick="removeDiligencePhoto(${index})">✕ Eliminar foto</button></div>`;
   }).join('');
-  preview.innerHTML=`<p><strong>${diligencePhotoFiles.length} foto(s) seleccionada(s).</strong> Vista previa de las imágenes que se adjuntarán al guardar la diligencia:</p><div class="photo-preview-grid">${items}</div>`;
+  preview.innerHTML=`<p><strong>${diligencePhotoFiles.length} foto(s) seleccionada(s).</strong> Puedes eliminar cualquier imagen equivocada antes de finalizar:</p><div class="photo-preview-grid">${items}</div>`;
 }
-cameraInput?.addEventListener('change',updatePhotoSelection);
-galleryInput?.addEventListener('change',updatePhotoSelection);
+function addSelectedPhotos(input){
+  const selected=Array.from(input?.files||[]);
+  for(const file of selected){
+    if(!diligencePhotoFiles.some(existing=>existing.name===file.name&&existing.size===file.size&&existing.lastModified===file.lastModified)){
+      diligencePhotoFiles.push(file);
+    }
+  }
+  if(input)input.value='';
+  updatePhotoSelection();
+}
+window.removeDiligencePhoto=index=>{
+  if(!Number.isInteger(index)||index<0||index>=diligencePhotoFiles.length)return;
+  diligencePhotoFiles.splice(index,1);
+  updatePhotoSelection();
+};
+cameraInput?.addEventListener('change',()=>addSelectedPhotos(cameraInput));
+galleryInput?.addEventListener('change',()=>addSelectedPhotos(galleryInput));
 async function uploadDiligencePhotos(diligenceId, files){
   if(!files?.length)return;
   for(const file of files){
@@ -973,6 +981,58 @@ async function uploadDiligencePhotos(diligenceId, files){
     if(metaErr){await sb.storage.from(PHOTO_BUCKET).remove([path]);throw new Error('La foto se subió pero no se pudo asociar a la diligencia: '+metaErr.message);}
   }
 }
+// Firma del cliente: se captura localmente y se adjunta como PNG al finalizar.
+const signatureCanvas=$('clientSignatureCanvas');
+const signatureCtx=signatureCanvas?.getContext('2d');
+let signatureHasInk=false,signatureDrawing=false;
+function resizeSignatureCanvas(){
+  if(!signatureCanvas||!signatureCtx)return;
+  const rect=signatureCanvas.getBoundingClientRect();
+  // Si el formulario estaba oculto al cargar, el canvas puede haberse creado de 1px.
+  // Esperamos a que tenga ancho real antes de dimensionarlo para dibujar correctamente.
+  if(!rect.width)return;
+  const ratio=Math.max(window.devicePixelRatio||1,1);
+  const targetW=Math.max(1,Math.round(rect.width*ratio));
+  const targetH=Math.max(1,Math.round(rect.height*ratio));
+  if(signatureCanvas.width===targetW&&signatureCanvas.height===targetH)return;
+  const old=signatureHasInk?signatureCanvas.toDataURL('image/png'):null;
+  signatureCanvas.width=targetW;
+  signatureCanvas.height=targetH;
+  signatureCtx.setTransform(ratio,0,0,ratio,0,0);
+  signatureCtx.lineWidth=2.5;signatureCtx.lineCap='round';signatureCtx.lineJoin='round';signatureCtx.strokeStyle='#142b25';
+  if(old){const img=new Image();img.onload=()=>signatureCtx.drawImage(img,0,0,rect.width,rect.height);img.src=old;}
+}
+function signaturePoint(e){
+  const rect=signatureCanvas.getBoundingClientRect();
+  return {x:e.clientX-rect.left,y:e.clientY-rect.top};
+}
+signatureCanvas?.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  resizeSignatureCanvas();
+  if(!signatureCanvas.width||!signatureCanvas.height)return;
+  signatureDrawing=true;signatureCanvas.setPointerCapture?.(e.pointerId);
+  const p=signaturePoint(e);signatureCtx.beginPath();signatureCtx.moveTo(p.x,p.y);signatureCtx.lineTo(p.x+.1,p.y+.1);signatureCtx.stroke();signatureHasInk=true;
+  if($('signatureHint'))$('signatureHint').textContent='Firma capturada; se adjuntará al finalizar.';
+});
+signatureCanvas?.addEventListener('pointermove',e=>{
+  if(!signatureDrawing)return;e.preventDefault();const p=signaturePoint(e);signatureCtx.lineTo(p.x,p.y);signatureCtx.stroke();
+});
+['pointerup','pointercancel','lostpointercapture'].forEach(ev=>signatureCanvas?.addEventListener(ev,()=>{signatureDrawing=false;}));
+function clearClientSignature(){
+  if(!signatureCanvas||!signatureCtx)return;
+  signatureCtx.clearRect(0,0,signatureCanvas.width,signatureCanvas.height);signatureHasInk=false;
+  if($('signatureHint'))$('signatureHint').textContent='Firma pendiente. La firma se adjuntará a la diligencia al finalizar.';
+}
+$('clearClientSignature')?.addEventListener('click',clearClientSignature);
+resizeSignatureCanvas();
+window.addEventListener('resize',resizeSignatureCanvas);
+async function getClientSignatureFile(){
+  if(!signatureCanvas||!signatureHasInk)return null;
+  const blob=await new Promise(resolve=>signatureCanvas.toBlob(resolve,'image/png'));
+  if(!blob)throw new Error('No se pudo preparar la firma del cliente.');
+  return new File([blob],`firma_cliente_${Date.now()}.png`,{type:'image/png',lastModified:Date.now()});
+}
+
 window.showDiligencePhotos=async id=>{
   if(!user||!(isAdmin()||isEvaluator()||isOperator()))return msg('No tiene permiso para consultar evidencias.','error');
   let d=(records||[]).find(x=>String(x.id)===String(id));
@@ -992,107 +1052,109 @@ window.showDiligencePhotos=async id=>{
   const old=$('diligencePhotoModal');if(old)old.remove();const modal=document.createElement('div');modal.id='diligencePhotoModal';modal.className='photo-modal';modal.innerHTML=`<div class="photo-modal-card"><div class="photo-modal-head"><h2>📷 Evidencias · Diligencia #${esc(id)}</h2><button class="btn secondary" type="button" id="closeDiligencePhotos">Cerrar</button></div>${body}</div>`;document.body.appendChild(modal);$('closeDiligencePhotos').onclick=()=>modal.remove();modal.onclick=e=>{if(e.target===modal)modal.remove()};
 };
 
-$('entryForm').onsubmit=async e=>{
-  e.preventDefault();
-  if(!sb||!user)return msg('Inicie sesión antes de guardar.','error');
-  if(!isAdmin()&&!isOperator())return msg('Su rol no puede registrar diligencias.','error');
-  if(!editing && isOperator()) $('entryCollaborator').value=user.id;
-  if(editing && !isAdmin())return msg('Solo el administrador puede editar diligencias.','error');
-  const evaluador_id=$('entryEvaluator')?.value||'';
-  if(!evaluador_id)return msg('Seleccione el evaluador que tendrá a cargo esta diligencia.','error');
-  let d=$('date').value;
-  const existingId=activeFormDiligenceId||editing;
-  const existing=existingId?(records||[]).find(x=>String(x.id)===String(existingId)):null;
-  let row={
+function collectDiligenceRow(existing=null){
+  const d=$('date').value||today();
+  const collaboratorId=$('entryCollaborator').value||user?.id||'';
+  return {
     date:d,month:d.slice(0,7),q:Math.ceil(Number(d.slice(8,10))/15),
-    colaborador:profiles.find(p=>String(p.id)===String($('entryCollaborator').value))?.full_name || $('colaborador').value.trim(),colaborador_id:$('entryCollaborator').value,
-    evaluador_id,departamento:$('departamento').value.trim(),cargo:$('cargo').value.trim(),
+    colaborador:profiles.find(p=>String(p.id)===String(collaboratorId))?.full_name || $('colaborador').value.trim() || currentProfile?.full_name || user?.email || '',
+    colaborador_id:collaboratorId,
+    evaluador_id:$('entryEvaluator')?.value||'',
+    departamento:$('departamento').value.trim(),cargo:$('cargo').value.trim(),
     destino:$('destino').value.trim(),motivo:$('motivo').value,
-    salida:existing?.salida||$('salida').value||'',regreso:existing?.regreso||$('regreso').value||'',
-    hours:Number(existing?.hours||0),sobre:Number($('sobre').value)||0,
-    viatico:Number($('viatico').value)||0,codigo:$('codigo').value.trim(),supervisor:$('supervisor').value.trim(),
+    salida:existing?.salida||'',regreso:existing?.regreso||'',hours:Number(existing?.hours||0),
+    sobre:Number($('sobre').value)||0,viatico:Number($('viatico').value)||0,
+    codigo:$('codigo').value.trim(),supervisor:$('supervisor').value.trim(),
     obs:$('obs').value.trim(),aprob:existing?.aprob||'Pendiente',created_by:existing?.created_by||user.id
   };
-  let savedId=existingId;
-  if(savedId){
-    const {error}=await sb.from('diligencias').update(row).eq('id',savedId);
-    if(error)return msg('No se pudo guardar: '+error.message,'error');
-  }else{
-    const {data,error}=await sb.from('diligencias').insert(row).select('id').single();
-    if(error)return msg('No se pudo guardar: '+error.message,'error');
-    savedId=data.id;
-  }
-  activeFormDiligenceId=savedId;
-  $('entryId').value=savedId;
-  await loadRecords();
-  updateFormOperationalButtons();
-  msg(existingId?'Datos de la diligencia guardados. Puedes continuar con el control operativo.':'Diligencia registrada. Ahora pulsa COMIENZO al salir; después añade las fotos y pulsa FINALIZAR al regresar.','ok');
+}
+function validateBeforeStart(){
+  if(!$('destino').value.trim())return 'Introduce el destino / cliente.';
+  if(!$('motivo').value)return 'Selecciona el motivo de la diligencia.';
+  if(!$('supervisor').value.trim())return 'Introduce el supervisor.';
+  if(!$('entryEvaluator')?.value)return 'Selecciona el evaluador asignado.';
+  return '';
+}
+// El operador no guarda manualmente al principio: COMIENZO crea el registro operativo
+// y registra la hora. FINALIZAR guarda los cambios, adjunta las fotos y cierra la diligencia.
+$('entryForm').onsubmit=async e=>{
+  e.preventDefault();
+  return msg('Sigue el flujo operativo: completa los datos y pulsa COMIENZO. Al regresar, adjunta las fotos y pulsa FINALIZAR DILIGENCIA para guardar y cerrar.','info');
 };
 
 window.startDiligence=async id=>{
   if(!user||!isOperator())return msg('Solo un operador activo puede comenzar diligencias.','error');
-  const item=records.find(x=>String(x.id)===String(id));
-  if(!item)return msg('No se encontró la diligencia en el historial actualizado.','error');
-  if(String(item.colaborador_id)!==String(user.id))return msg('Solo puedes comenzar tus propias diligencias.','error');
-  if(String(item.aprob||'').toUpperCase()==='ANULADO')return msg('No puedes comenzar una diligencia anulada.','error');
+  const validation=validateBeforeStart();if(validation)return msg(validation,'error');
+  if(!id){
+    if(String($('entryCollaborator').value)!==String(user.id))$('entryCollaborator').value=user.id;
+    const row=collectDiligenceRow();
+    const {data,error}=await sb.from('diligencias').insert(row).select('id').single();
+    if(error)return msg('No se pudo preparar la diligencia: '+error.message,'error');
+    id=data.id;activeFormDiligenceId=id;$('entryId').value=id;
+  }
+  const item=(records||[]).find(x=>String(x.id)===String(id));
+  if(item && String(item.colaborador_id)!==String(user.id))return msg('Solo puedes comenzar tus propias diligencias.','error');
+  if(item && String(item.aprob||'').toUpperCase()==='ANULADO')return msg('No puedes comenzar una diligencia anulada.','error');
   const {data,error}=await sb.rpc('start_diligence',{p_id:id});
-  if(error)return msg('No se pudo comenzar la diligencia: '+error.message,'error');
+  if(error)return msg('El registro quedó preparado, pero no se pudo iniciar: '+error.message,'error');
   if(!data?.ok)return msg(data?.message||'Supabase no permitió comenzar la diligencia.','error');
-  msg('Diligencia iniciada correctamente. La hora de salida se registró automáticamente.','ok');
+  activeFormDiligenceId=id;$('entryId').value=id;
+  msg('Mensajería iniciada. La hora de salida se registró automáticamente.','ok');
   await loadRecords();updateFormOperationalButtons();
 };
 
 window.finishDiligence=async id=>{
   if(!user||!isOperator())return msg('Solo un operador activo puede finalizar diligencias.','error');
-  const item=records.find(x=>String(x.id)===String(id));
-  if(!item)return msg('No se encontró la diligencia en el historial actualizado.','error');
-  if(String(item.colaborador_id)!==String(user.id))return msg('Solo puedes finalizar tus propias diligencias.','error');
-  if(!item.started_at && String(item.operational_status||'').toUpperCase()!=='EN_CURSO')return msg('Primero debes comenzar esta diligencia.','error');
-  if(item.finished_at || String(item.operational_status||'').toUpperCase()==='FINALIZADA')return msg('Esta diligencia ya fue finalizada.','error');
-  if(!confirm('¿Confirmas que deseas finalizar esta diligencia? Se registrará la hora de regreso y se calculará la duración.'))return;
+  id=id||activeFormDiligenceId||$('entryId')?.value;
+  if(!id)return msg('Primero pulsa COMIENZO para iniciar la mensajería.','error');
+  const item=(records||[]).find(x=>String(x.id)===String(id));
+  if(item && String(item.colaborador_id)!==String(user.id))return msg('Solo puedes finalizar tus propias diligencias.','error');
+  if(item && !item.started_at && String(item.operational_status||'').toUpperCase()!=='EN_CURSO')return msg('Primero debes iniciar la mensajería con COMIENZO.','error');
+  if(item && (item.finished_at || String(item.operational_status||'').toUpperCase()==='FINALIZADA'))return msg('Esta diligencia ya fue finalizada.','error');
+  if(!confirm('¿Confirmas que deseas finalizar la mensajería? Se guardarán los datos, las fotografías, la hora de regreso y la duración.'))return;
+  const photos=[...diligencePhotoFiles];
+  try{const signatureFile=await getClientSignatureFile();if(signatureFile)photos.push(signatureFile);}catch(err){return msg(err.message,'error');}
+  if(photos.length){
+    try{await uploadDiligencePhotos(id,photos);diligencePhotoFiles=[];diligencePhotoObjectUrls.forEach(url=>URL.revokeObjectURL(url));diligencePhotoObjectUrls=[];if($('diligencePhotos'))$('diligencePhotos').value='';if($('diligenceGalleryPhotos'))$('diligenceGalleryPhotos').value='';if($('diligencePhotoPreview'))$('diligencePhotoPreview').innerHTML='Fotos y firma guardadas correctamente.';clearClientSignature();}
+    catch(err){return msg('No se pudieron guardar las fotos; la mensajería sigue en curso: '+err.message,'error');}
+  }
+  // Guardar los últimos cambios del formulario antes de cerrar la diligencia.
+  const row=collectDiligenceRow(item||null);
+  const {error:updateError}=await sb.from('diligencias').update(row).eq('id',id).eq('colaborador_id',user.id);
+  if(updateError)return msg('No se pudieron guardar los datos finales: '+updateError.message,'error');
   const {data,error}=await sb.rpc('finish_diligence',{p_id:id});
-  if(error)return msg('No se pudo finalizar la diligencia: '+error.message,'error');
+  if(error)return msg('Los datos quedaron guardados, pero no se pudo finalizar: '+error.message,'error');
   if(!data?.ok)return msg(data?.message||'Supabase no permitió finalizar la diligencia.','error');
-  msg(`Diligencia finalizada correctamente. Duración: ${Number(data.hours||0).toFixed(2)} horas.`, 'ok');
+  activeFormDiligenceId=id;$('entryId').value=id;
+  msg(`Mensajería finalizada y guardada. Duración: ${Number(data.hours||0).toFixed(2)} horas.`,'ok');
   await loadRecords();updateFormOperationalButtons();
 };
 
 function updateFormOperationalButtons(){
   const start=$('formStartBtn'),finish=$('formFinishBtn'),hint=$('formOperationalHint');
   if(!start||!finish)return;
-  const id=activeFormDiligenceId||editing;
+  const id=activeFormDiligenceId||editing||$('entryId')?.value||null;
   const x=(records||[]).find(r=>String(r.id)===String(id));
   const owns=!!x&&String(x.colaborador_id)===String(user?.id);
   const started=!!x?.started_at||String(x?.operational_status||'').toUpperCase()==='EN_CURSO'||String(x?.operational_status||'').toUpperCase()==='FINALIZADA';
   const finished=!!x?.finished_at||String(x?.operational_status||'').toUpperCase()==='FINALIZADA';
-  const allowed=!!user&&isOperator()&&owns&&String(x?.aprob||'').toUpperCase()!=='ANULADO';
-  start.disabled=!allowed||started;finish.disabled=!allowed||!started||finished;
+  const allowed=!!user&&isOperator()&&(!id||!x||owns)&&String(x?.aprob||'').toUpperCase()!=='ANULADO';
+  start.disabled=!allowed||started;
+  finish.disabled=!allowed||!id||!started||finished;
   if(hint){
-    if(!id||!x)hint.textContent='Guarda la diligencia para habilitar COMIENZO.';
-    else if(!isOperator())hint.textContent='Inicia sesión con el usuario OPERADOR asignado para registrar las horas.';
-    else if(!owns)hint.textContent='Solo el mensajero asignado puede iniciar o finalizar esta diligencia.';
-    else if(finished)hint.textContent=`Diligencia finalizada · salida ${x.salida||'—'} · regreso ${x.regreso||'—'} · ${Number(x.hours||0).toFixed(2)} horas.`;
-    else if(started)hint.textContent=`En curso desde ${x.salida||'—'}. Añade las fotografías y pulsa FINALIZAR DILIGENCIA al regresar.`;
-    else hint.textContent='Diligencia guardada. Pulsa COMIENZO al salir.';
+    if(!user||!isOperator())hint.textContent='Inicia sesión con el usuario OPERADOR para comenzar y finalizar la mensajería.';
+    else if(finished)hint.textContent=`Mensajería finalizada y guardada · salida ${x?.salida||'—'} · regreso ${x?.regreso||'—'} · ${Number(x?.hours||0).toFixed(2)} horas.`;
+    else if(started)hint.textContent=`Mensajería en curso desde ${x?.salida||'la hora registrada'}. Toma fotos o elígelas de la galería; al regresar pulsa FINALIZAR DILIGENCIA para guardar todo.`;
+    else hint.textContent='Completa destino, motivo y supervisor. Pulsa COMIENZO al salir; el registro se crea automáticamente.';
   }
 }
 $('formStartBtn')?.addEventListener('click',async()=>{
-  const id=activeFormDiligenceId||editing;
-  if(!id)return msg('Primero guarda la diligencia.','error');
+  const id=activeFormDiligenceId||editing||$('entryId')?.value||null;
   await window.startDiligence(id);
-  const current=(records||[]).find(r=>String(r.id)===String(id));
-  if(current&&current.started_at)updateFormOperationalButtons();
 });
 $('formFinishBtn')?.addEventListener('click',async()=>{
-  const id=activeFormDiligenceId||editing;
-  if(!id)return msg('Primero guarda la diligencia.','error');
-  const photos=[...diligencePhotoFiles];
-  if(photos.length){
-    try{await uploadDiligencePhotos(id,photos);diligencePhotoFiles=[];diligencePhotoObjectUrls.forEach(url=>URL.revokeObjectURL(url));diligencePhotoObjectUrls=[];if($('diligencePhotos'))$('diligencePhotos').value='';if($('diligenceGalleryPhotos'))$('diligenceGalleryPhotos').value='';if($('diligencePhotoPreview'))$('diligencePhotoPreview').innerHTML='Fotos guardadas correctamente.';}
-    catch(err){return msg('No se pudieron guardar las fotos; la diligencia sigue en curso: '+err.message,'error');}
-  }
+  const id=activeFormDiligenceId||editing||$('entryId')?.value||null;
   await window.finishDiligence(id);
-  updateFormOperationalButtons();
 });
 
 async function loadDashboardExtras(){
@@ -1611,13 +1673,14 @@ async function loadEvaluationData(){
   if(!user)return;
   await loadProfiles();
   fillCollaboratorSelects();
-  const {data:allDiligencias,error:dErr}=await sb.from('diligencias').select('id,date,month,q,colaborador,colaborador_id,evaluador_id,destino,motivo,salida,regreso,obs').order('date',{ascending:false}).limit(2000);
+  const {data:allDiligencias,error:dErr}=await sb.from('diligencias').select('id,date,month,q,colaborador,colaborador_id,evaluador_id,destino,motivo,salida,regreso,obs,aprob,operational_status,started_at,finished_at').order('date',{ascending:false}).limit(2000);
   if(dErr){$('evaluationPendingList').innerHTML='<div class="empty">No se pudieron cargar las diligencias asignadas.</div>';return}
   const {data:evs,error:eErr}=await sb.from('evaluaciones').select('*').order('created_at',{ascending:false}).limit(2000);
   if(eErr){$('evaluationList').innerHTML='<div class="empty">No se pudieron cargar las evaluaciones.</div>';return}
   const evaluationsArr=evs||[];
   const evalByDiligence=new Map(evaluationsArr.filter(x=>x.diligencia_id!=null).map(x=>[String(x.diligencia_id),x]));
-  let visible=allDiligencias||[];
+  // Las diligencias anuladas no deben aparecer como pendientes ni ser evaluables.
+  let visible=(allDiligencias||[]).filter(d=>String(d.aprob||'').trim().toUpperCase()!=='ANULADO');
   if(isEvaluator()) visible=visible.filter(d=>String(d.evaluador_id)===String(user.id));
   if(isOperator()) visible=visible.filter(d=>String(d.colaborador_id)===String(user.id));
   const month=$('evalMonth')?.value||today().slice(0,7);

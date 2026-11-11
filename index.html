@@ -591,6 +591,24 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
   }
 }
 
+/* PANLOGISTICS: flujo visible e interactivo del control semanal Hino */
+.truck-workflow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.truck-step{border:1px solid #dce5e8;border-radius:13px;background:#fff;padding:13px;min-width:0;box-shadow:0 3px 12px #1022360b}
+.truck-step strong{display:block;color:#073b2c;font-size:13px;margin-bottom:4px}
+.truck-step p{margin:0 0 10px;color:#687386;font-size:11px;line-height:1.35}
+.truck-step .btn{width:100%;padding:10px;font-size:12px}
+.truck-progress{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border:1px solid #dce5e8;border-radius:10px;background:#f7faf9;padding:10px 12px;margin:10px 0 6px}
+.truck-progress strong{color:#073b2c;font-size:13px}
+.truck-progress span{font-size:12px;color:#687386}
+.truck-camera-slot{width:100%;min-width:0;min-height:158px;border:2px dashed #8da99b;background:linear-gradient(180deg,#fff,#f4faf6);transition:border-color .15s,background .15s,transform .15s}
+.truck-camera-slot:hover{border-color:#087a4c;background:#effaf4;transform:translateY(-1px)}
+.truck-camera-slot .camera-icon{font-size:34px}
+.truck-camera-slot strong{font-size:12px;color:#173b2d}
+.truck-camera-slot .camera-placeholder span:last-child{font-weight:800;color:#087a4c}
+.truck-camera-item{min-width:0}
+#reportPreview{scroll-margin-top:18px}
+.report-preview-wrap{margin-top:8px}
+@media(max-width:760px){.truck-workflow{grid-template-columns:1fr}.truck-step{padding:12px}.truck-camera-slot{min-height:142px}}
 .truck-section{border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0;background:#fbfcfe}.truck-section h3{margin:0 0 10px;color:var(--navy)}.truck-photo-note{font-size:12px;color:#7a570e;background:#fff6dc;border:1px solid #f0dfab;border-radius:9px;padding:9px;margin:8px 0}.truck-record{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0;background:white}.truck-record-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.truck-photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:8px}.truck-photo-grid img{width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}@media(max-width:600px){.truck-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}.truck-camera-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}.truck-camera-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;padding:10px;border:2px dashed #b7c7d8;border-radius:12px;background:#fff;color:#17334b;font-weight:800;cursor:pointer;text-align:center}.truck-camera-slot:focus-visible{outline:3px solid #e7b94e;outline-offset:2px}.truck-camera-slot .camera-placeholder{display:flex;flex-direction:column;align-items:center;gap:7px;color:#587087;font-size:12px}.truck-camera-slot .camera-icon{font-size:30px}.truck-camera-slot img{width:100%;height:112px;object-fit:cover;border-radius:8px}.truck-camera-slot .camera-retake{font-size:11px;color:#08784f}@media(max-width:760px){.truck-camera-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.truck-camera-slot{min-height:140px}}.truck-camera-modal{position:fixed;inset:0;z-index:99999;background:#081522e8;display:flex;align-items:center;justify-content:center;padding:16px}.truck-camera-dialog{width:min(760px,100%);max-height:95dvh;overflow:auto;background:#fff;border-radius:18px;padding:16px;box-shadow:0 20px 70px #0008}.truck-camera-dialog h2{margin:0 0 5px;color:#17294a}.truck-camera-dialog p{margin:0 0 12px;color:#60708a;font-size:13px}.truck-camera-stage{position:relative;background:#101827;border-radius:12px;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:center}.truck-camera-stage video,.truck-camera-stage img{display:block;width:100%;max-height:62dvh;object-fit:contain}.truck-camera-error{padding:22px;color:#b42318;background:#fff0ef;border-radius:10px;margin:10px 0}.truck-camera-dialog .actions{margin-top:12px}.truck-camera-dialog .btn{min-height:48px}.truck-camera-dialog .camera-tip{font-size:12px;color:#66758a;margin-top:10px}@media(max-width:600px){.truck-camera-modal{padding:7px}.truck-camera-dialog{padding:12px;border-radius:14px}.truck-camera-stage{min-height:190px}}</style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
@@ -896,23 +914,28 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 
     <section id="gpsView" hidden><div class="panel"><h2>📍 Seguimiento GPS de operadores</h2><p class="hint">Ubicaciones compartidas voluntariamente por los operadores.</p><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0"><span id="gpsAdminLiveStatus" class="gps-status off">Consultando ubicaciones…</span><button class="btn secondary" id="gpsAdminRefresh" type="button">↻ Actualizar mapa</button></div><div id="gpsMap" aria-label="Mapa de ubicaciones de operadores"></div></div><div class="panel"><h2>Últimas ubicaciones registradas</h2><div id="gpsHistory" class="gps-history"><div class="empty">Cargando historial…</div></div></div></section>
 <section id="truckHandoverView" hidden>
-<div class="panel"><h2>🚚 Control semanal · Hino AT8811</h2><p class="hint">Registra el retiro al recibir el camión y completa la entrega al devolverlo. Las fotografías de ambos momentos son obligatorias.</p><div id="truckHandoverStatus" class="status" hidden></div>
+<div class="panel"><h2>🚚 Control semanal · Hino AT8811</h2><p class="hint">Control digital de recepción y devolución. Completa cada etapa, toma las fotografías desde la cámara y consulta los controles anteriores.</p><div id="truckHandoverStatus" class="status" hidden></div>
+<div class="truck-workflow" aria-label="Etapas del control del camión">
+  <div class="truck-step"><strong>1 · RETIRO</strong><p>Registrar quién recibe, kilometraje, combustible, estado y cuatro fotografías actuales.</p><button class="btn primary" type="button" data-truck-scroll="truckWithdrawalSection">Abrir retiro</button></div>
+  <div class="truck-step"><strong>2 · ENTREGA</strong><p>Seleccionar un control pendiente, registrar devolución y tomar cuatro fotografías nuevas.</p><button class="btn gold" type="button" data-truck-scroll="truckReturnPanel">Ir a entrega</button></div>
+  <div class="truck-step"><strong>3 · HISTORIAL</strong><p>Consultar controles semanales, estado de cierre y evidencia fotográfica.</p><button class="btn secondary" type="button" data-truck-scroll="truckHistoryPanel">Ver historial</button></div>
+</div>
 <form id="truckWithdrawalForm"><input id="truckRecordId" type="hidden">
-<div class="truck-section"><h3>1. Retiro del camión</h3><div class="grid">
+<div class="truck-section" id="truckWithdrawalSection"><h3>1. Retiro del camión</h3><div class="grid">
 <div class="field"><label>Semana · desde</label><input id="truckWeekStart" type="date" required></div><div class="field"><label>Semana · hasta</label><input id="truckWeekEnd" type="date" required></div>
 <div class="field"><label>Fecha y hora de retiro</label><input id="truckWithdrawalAt" type="datetime-local" required></div><div class="field"><label>Lugar de retiro</label><input id="truckWithdrawalPlace" required></div>
 <div class="field"><label>Kilometraje al retirar</label><input id="truckWithdrawalKm" type="number" min="0" required></div><div class="field"><label>Combustible al retirar</label><select id="truckWithdrawalFuel" required><option value="">Seleccione</option><option>Vacío</option><option>1/4</option><option>1/2</option><option>3/4</option><option>Lleno</option></select></div></div>
 <h3>Estado general al recibir</h3><div class="grid" id="truckWithdrawalCondition"></div><div class="field"><label>Observaciones al retirar</label><textarea id="truckWithdrawalObs"></textarea></div>
-<div class="field"><label>Fotografías del retiro · toca cada vista para abrir la cámara</label><div id="truckWithdrawalPhotos" class="truck-camera-grid"></div><p class="truck-photo-note">Debes capturar en el momento las cuatro vistas: frontal, trasera y ambos laterales. Cada espacio guarda su propia fotografía.</p></div>
+<div class="field"><label>Fotografías del retiro · toca cada recuadro para abrir la cámara</label><div class="truck-progress"><strong>Fotos de recepción</strong><span id="truckWithdrawalPhotoProgress">0 de 4 capturadas</span></div><div id="truckWithdrawalPhotos" class="truck-camera-grid"></div><p class="truck-photo-note">Debes capturar en el momento las cuatro vistas: frontal, trasera y ambos laterales. Cada espacio guarda su propia fotografía.</p></div>
 <div class="grid"><div class="field"><label>Nombre de quien recibe</label><input id="truckReceivedBy" required></div><div class="field"><label>Supervisor</label><input id="truckSupervisor" required></div></div></div>
 <div class="actions"><button class="btn primary" id="truckSaveWithdrawal" type="submit">Guardar retiro</button><button class="btn secondary" type="button" id="truckResetForm">Limpiar</button></div></form>
 <div id="truckReturnPanel" hidden><div class="truck-section"><h3>2. Entrega del camión</h3><p class="hint">Completa al devolver el vehículo.</p><div class="grid">
 <div class="field"><label>Fecha y hora de entrega</label><input id="truckReturnAt" type="datetime-local"></div><div class="field"><label>Lugar de entrega</label><input id="truckReturnPlace"></div>
 <div class="field"><label>Kilometraje al entregar</label><input id="truckReturnKm" type="number" min="0"></div><div class="field"><label>Combustible al entregar</label><select id="truckReturnFuel"><option value="">Seleccione</option><option>Vacío</option><option>1/4</option><option>1/2</option><option>3/4</option><option>Lleno</option></select></div></div>
 <h3>Estado general al entregar</h3><div class="grid" id="truckReturnCondition"></div><div class="field"><label>Observaciones al entregar</label><textarea id="truckReturnObs"></textarea></div>
-<div class="field"><label>Fotografías de la entrega · toca cada vista para abrir la cámara</label><div id="truckReturnPhotos" class="truck-camera-grid"></div><p class="truck-photo-note">Toma cuatro fotografías nuevas al devolver el camión. No se reutilizan las imágenes del retiro.</p></div>
+<div class="field"><label>Fotografías de la entrega · toca cada recuadro para abrir la cámara</label><div class="truck-progress"><strong>Fotos de devolución</strong><span id="truckReturnPhotoProgress">0 de 4 capturadas</span></div><div id="truckReturnPhotos" class="truck-camera-grid"></div><p class="truck-photo-note">Toma cuatro fotografías nuevas al devolver el camión. No se reutilizan las imágenes del retiro.</p></div>
 <div class="grid"><div class="field"><label>Nombre de quien entrega</label><input id="truckDeliveredBy"></div><div class="field"><label>Nombre de quien recibe</label><input id="truckReturnReceivedBy"></div></div></div><div class="actions"><button class="btn gold" id="truckSaveReturn" type="button">Guardar entrega y cerrar semana</button></div></div>
-</div><div class="panel"><div class="truck-record-head"><h2>Historial de controles semanales</h2><button class="btn secondary" id="truckRefresh" type="button">↻ Actualizar</button></div><div id="truckRecordsList"><div class="empty">Cargando registros…</div></div></div></section>\n<section id="resultsView" hidden>
+</div><div class="panel" id="truckHistoryPanel"><div class="truck-record-head"><h2>Historial de controles semanales</h2><button class="btn secondary" id="truckRefresh" type="button">↻ Actualizar</button></div><div id="truckRecordsList"><div class="empty">Cargando registros…</div></div></div></section>\n<section id="resultsView" hidden>
       <div class="panel">
         <h2>Resultados mensuales</h2>
         <div class="grid">
@@ -2261,6 +2284,7 @@ async function generateQuincenalReport(){
     <footer class="report-footer"><span>Documento interno · PANLOGISTICS GROUP, S.A.</span><span>Reporte quincenal · ${anio}-${String(mes).padStart(2,'0')}</span></footer>
   </article></div>`;
   $('printReport').disabled=false;
+  requestAnimationFrame(()=> $('reportPreview')?.scrollIntoView({behavior:'smooth',block:'start'}));
 }
 $('generateReport').onclick=generateQuincenalReport;
 function printQuincenalReport(){
@@ -2335,14 +2359,21 @@ function truckCondition(p){const o={};TRUCK_PARTS.forEach((x,i)=>o[x]=$(p+i).val
 function truckNow(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
 function truckStatus(t,type=''){const e=$('truckHandoverStatus');e.hidden=false;e.textContent=t;e.className='status '+type}
 let truckCameraStream=null,truckCameraTarget=null,truckCameraDraftBlob=null,truckCameraDraftUrl=null,truckCameraFacing='environment';
+function truckUpdatePhotoProgress(stage){
+  const total=TRUCK_ANGLES.filter(a=>truckPhotoSelections[stage][a.id]?.file).length;
+  const target=$(stage==='retiro'?'truckWithdrawalPhotoProgress':'truckReturnPhotoProgress');
+  if(target)target.textContent=total+' de 4 capturadas'+(total===4?' · Completo':'');
+}
 function truckBuildPhotoSlots(stage){
   const host=$(stage==='retiro'?'truckWithdrawalPhotos':'truckReturnPhotos');if(!host)return;
-  host.innerHTML=TRUCK_ANGLES.map(a=>'<div class="truck-camera-item"><button class="truck-camera-slot" type="button" data-truck-camera="'+stage+'" data-angle="'+a.id+'" aria-label="Abrir cámara: '+a.label+'"><span class="camera-placeholder"><span class="camera-icon">📷</span><span>Abrir cámara</span></span><strong>'+a.label+'</strong></button></div>').join('');
+  host.innerHTML=TRUCK_ANGLES.map(a=>'<div class="truck-camera-item"><button class="truck-camera-slot" type="button" data-truck-camera="'+stage+'" data-angle="'+a.id+'" aria-label="Abrir cámara: '+a.label+'"><span class="camera-placeholder"><span class="camera-icon">📷</span><span>Toca para tomar foto</span></span><strong>'+a.label+'</strong></button></div>').join('');
+  truckUpdatePhotoProgress(stage);
 }
 function truckRenderPhotoSlot(stage,angle){
   const selection=truckPhotoSelections[stage][angle],button=document.querySelector('[data-truck-camera="'+stage+'"][data-angle="'+angle+'"]');if(!button)return;
   const label=TRUCK_ANGLES.find(a=>a.id===angle)?.label||angle;
-  button.innerHTML=selection?.previewUrl?'<img src="'+selection.previewUrl+'" alt="'+label+'"><strong>'+label+'</strong><span class="camera-retake">✓ Foto capturada · repetir</span>':'<span class="camera-placeholder"><span class="camera-icon">📷</span><span>Abrir cámara</span></span><strong>'+label+'</strong>';
+  button.innerHTML=selection?.previewUrl?'<img src="'+selection.previewUrl+'" alt="'+label+'"><strong>'+label+'</strong><span class="camera-retake">✓ Foto capturada · toca para repetir</span>':'<span class="camera-placeholder"><span class="camera-icon">📷</span><span>Toca para tomar foto</span></span><strong>'+label+'</strong>';
+  truckUpdatePhotoProgress(stage);
 }
 function truckClearPhotoSelections(stage){
   const stages=stage?[stage]:['retiro','entrega'];
@@ -2398,6 +2429,17 @@ function truckConfirmPhoto(){
   truckCloseCamera();truckRenderPhotoSlot(stage,angle);truckStatus('Fotografía confirmada: '+label+'.','ok');
 }
 document.addEventListener('click',e=>{
+  const jump=e.target.closest('[data-truck-scroll]');
+  if(jump){
+    const target=$(jump.dataset.truckScroll);
+    if(target){
+      if(target.id==='truckReturnPanel'&&target.hidden){
+        truckStatus('Para completar una entrega, abre primero un control pendiente desde el historial.','');
+        $('truckHistoryPanel')?.scrollIntoView({behavior:'smooth',block:'start'});
+      }else target.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    return;
+  }
   const button=e.target.closest('[data-truck-camera]');if(button)truckOpenCamera(button.dataset.truckCamera,button.dataset.angle);
 });
 $('truckCameraCapture').addEventListener('click',truckCapturePhoto);

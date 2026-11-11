@@ -983,7 +983,8 @@ function tab(id){
   if(id==='settingsView')loadSettings();
   if(id==='usersView')loadUsersData();
   if(id==='gpsView'){loadGpsAdminData();startGpsAdminRefresh();}else stopGpsAdminRefresh();
-  if(id==='truckHandoverView')loadTruckHandoverRecords();\n  if(id==='resultsView')loadResultData();
+  if(id==='truckHandoverView')loadTruckHandoverRecords();
+  if(id==='resultsView')loadResultData();
   if(id==='reportsView')loadReportSelectors();
 }
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>tab(b.dataset.tab));

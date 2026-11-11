@@ -538,6 +538,59 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 /* Vista previa: tres indicadores distribuidos sin una columna vacía. */
 .report-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
+
+/* Ajuste final de paginación del reporte quincenal */
+@page { size: Letter portrait; margin: 0.34in 0.42in 0.34in 0.42in; }
+@media print {
+  html, body { margin:0!important; padding:0!important; }
+  .report-page {
+    width:100%!important;
+    min-height:0!important;
+    height:auto!important;
+    padding:0!important;
+    margin:0!important;
+    overflow:visible!important;
+  }
+  .report-section-title {
+    break-after:avoid-page!important;
+    page-break-after:avoid!important;
+    margin-top:10px!important;
+    margin-bottom:5px!important;
+  }
+  .report-section-title + .report-table {
+    break-before:avoid-page!important;
+    page-break-before:avoid!important;
+  }
+  .report-table {
+    break-inside:auto!important;
+    page-break-inside:auto!important;
+  }
+  .report-table thead { display:table-header-group!important; }
+  .report-table tr {
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  .report-total { margin-top:8px!important; gap:8px!important; }
+  .report-signatures {
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+    margin-top:10px!important;
+    gap:32px!important;
+  }
+  .report-sign { padding-top:14px!important; }
+  .report-signatures + .report-footer {
+    break-before:avoid-page!important;
+    page-break-before:avoid!important;
+    margin-top:8px!important;
+    padding-top:5px!important;
+  }
+  .report-footer {
+    break-inside:auto!important;
+    page-break-inside:auto!important;
+    margin-bottom:0!important;
+  }
+}
+
 </style>
 </head>
 <body>

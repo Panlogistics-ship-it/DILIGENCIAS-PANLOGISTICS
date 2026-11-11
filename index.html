@@ -1006,7 +1006,8 @@ function canUseTab(id){
   if(id==='exportView') return isAdmin();
   if(id==='settingsView') return isAdmin();
   if(id==='usersView') return isAdmin();
-  if(id==='gpsView') return isAdmin();\n  if(id==='truckHandoverView') return isAdmin()||isOperator();
+  if(id==='gpsView') return isAdmin();
+  if(id==='truckHandoverView') return isAdmin()||isOperator();
   return false;
 }
 function applyRolePermissions(){

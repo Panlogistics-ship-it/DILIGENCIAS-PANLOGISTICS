@@ -437,6 +437,107 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 #app>.topbar #logoutTop:hover{filter:brightness(1.04)}
 @media(max-width:700px){#app>.app-brand-header{padding:17px 16px!important}#app>.app-brand-header h1{font-size:clamp(25px,6vw,34px)!important;line-height:1.12!important}#app>.app-brand-header p{font-size:13px!important}}
 
+
+/* PANLOGISTICS — impresión limpia del reporte quincenal */
+@media print {
+  @page { size: Letter portrait; margin: 0.42in; }
+
+  html, body {
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  /* Oculta el encabezado general de la aplicación y deja solo el reporte. */
+  body > header,
+  body > footer,
+  body > main > :not(#app) {
+    display: none !important;
+  }
+  body > main {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #app {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #app > :not(#reportsView) { display: none !important; }
+
+  #reportsView {
+    display: block !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #reportsView > .report-controls { display: none !important; }
+  #reportPreview { display: block !important; }
+  .report-preview-wrap {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    border-radius: 0 !important;
+  }
+  .report-page {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  /* Evita títulos huérfanos y permite que las tablas largas fluyan entre páginas. */
+  .report-header,
+  .report-title,
+  .report-meta,
+  .report-kpis,
+  .report-total,
+  .report-note,
+  .report-signatures,
+  .report-footer {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .report-section-title {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .report-table {
+    width: 100% !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+  .report-table thead { display: table-header-group; }
+  .report-table tfoot { display: table-footer-group; }
+  .report-table tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .report-signatures { margin-top: 16px !important; }
+}
+
+/* Vista previa: tres indicadores distribuidos sin una columna vacía. */
+.report-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
 </style>
 </head>
 <body>
@@ -2061,7 +2162,7 @@ async function generateQuincenalReport(){
     <div class="report-section-title">Evaluación de desempeño</div>
     <table class="report-table"><thead><tr><th>Criterio</th><th>Puntuación</th></tr></thead><tbody>${evalRows}</tbody></table>
     <div class="report-section-title">Combustible registrado</div>
-    <table class="report-table"><thead><tr><th>Fecha</th><th>Litros</th><th>Precio/L</th><th>Costo</th><th>Carga</th></tr></thead><tbody>${fuelRows}</tbody></table>
+    <table class="report-table"><thead><tr><th>Fecha</th><th>Galones</th><th>Precio/galón</th><th>Costo</th><th>Carga</th></tr></thead><tbody>${fuelRows}</tbody></table>
     <div class="report-section-title">Observaciones</div>
     <div class="report-note">${esc(evaluation?.observaciones||'Sin observaciones registradas para la quincena.')}</div>
     <div class="report-signatures"><div class="report-sign">Elaborado / generado por<br><strong>PANLOGISTICS GROUP, S.A.</strong></div><div class="report-sign">Revisado / aprobado por<br><strong>Firma y nombre</strong></div></div>

@@ -2357,7 +2357,7 @@ function truckCloseCamera(){
   truckCameraDraftBlob=null;truckCameraTarget=null;$('truckCameraModal').hidden=true;
 }
 async function truckStartCamera(){
-  truckStopCamera();$('truckCameraError').hidden=true;$('truckCameraLiveActions').hidden=true;$('truckCameraPreviewActions').hidden=true;$('truckCameraPreview').hidden=true;$('truckCameraVideo').hidden=false;
+  truckStopCamera();$('truckCameraCapture').disabled=false;$('truckCameraError').hidden=true;$('truckCameraLiveActions').hidden=true;$('truckCameraPreviewActions').hidden=true;$('truckCameraPreview').hidden=true;$('truckCameraVideo').hidden=false;
   if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){$('truckCameraError').hidden=false;$('truckCameraError').textContent='El navegador no permite abrir la cámara. Accede mediante HTTPS y utiliza un navegador actualizado.';$('truckCameraCancel').textContent='Cerrar';$('truckCameraLiveActions').hidden=false;return}
   try{
     truckCameraStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:truckCameraFacing},width:{ideal:1920},height:{ideal:1080}}});

@@ -591,7 +591,7 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
   }
 }
 
-.truck-section{border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0;background:#fbfcfe}.truck-section h3{margin:0 0 10px;color:var(--navy)}.truck-photo-note{font-size:12px;color:#7a570e;background:#fff6dc;border:1px solid #f0dfab;border-radius:9px;padding:9px;margin:8px 0}.truck-record{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0;background:white}.truck-record-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.truck-photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:8px}.truck-photo-grid img{width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}@media(max-width:600px){.truck-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}.truck-camera-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}.truck-camera-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;padding:10px;border:2px dashed #b7c7d8;border-radius:12px;background:#fff;color:#17334b;font-weight:800;cursor:pointer;text-align:center}.truck-camera-slot:focus-visible{outline:3px solid #e7b94e;outline-offset:2px}.truck-camera-slot .camera-placeholder{display:flex;flex-direction:column;align-items:center;gap:7px;color:#587087;font-size:12px}.truck-camera-slot .camera-icon{font-size:30px}.truck-camera-slot img{width:100%;height:112px;object-fit:cover;border-radius:8px}.truck-camera-slot .camera-retake{font-size:11px;color:#08784f}@media(max-width:760px){.truck-camera-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.truck-camera-slot{min-height:140px}}</style>
+.truck-section{border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0;background:#fbfcfe}.truck-section h3{margin:0 0 10px;color:var(--navy)}.truck-photo-note{font-size:12px;color:#7a570e;background:#fff6dc;border:1px solid #f0dfab;border-radius:9px;padding:9px;margin:8px 0}.truck-record{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0;background:white}.truck-record-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.truck-photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:8px}.truck-photo-grid img{width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}@media(max-width:600px){.truck-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}.truck-camera-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}.truck-camera-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;padding:10px;border:2px dashed #b7c7d8;border-radius:12px;background:#fff;color:#17334b;font-weight:800;cursor:pointer;text-align:center}.truck-camera-slot:focus-visible{outline:3px solid #e7b94e;outline-offset:2px}.truck-camera-slot .camera-placeholder{display:flex;flex-direction:column;align-items:center;gap:7px;color:#587087;font-size:12px}.truck-camera-slot .camera-icon{font-size:30px}.truck-camera-slot img{width:100%;height:112px;object-fit:cover;border-radius:8px}.truck-camera-slot .camera-retake{font-size:11px;color:#08784f}@media(max-width:760px){.truck-camera-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.truck-camera-slot{min-height:140px}}.truck-camera-modal{position:fixed;inset:0;z-index:99999;background:#081522e8;display:flex;align-items:center;justify-content:center;padding:16px}.truck-camera-dialog{width:min(760px,100%);max-height:95dvh;overflow:auto;background:#fff;border-radius:18px;padding:16px;box-shadow:0 20px 70px #0008}.truck-camera-dialog h2{margin:0 0 5px;color:#17294a}.truck-camera-dialog p{margin:0 0 12px;color:#60708a;font-size:13px}.truck-camera-stage{position:relative;background:#101827;border-radius:12px;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:center}.truck-camera-stage video,.truck-camera-stage img{display:block;width:100%;max-height:62dvh;object-fit:contain}.truck-camera-error{padding:22px;color:#b42318;background:#fff0ef;border-radius:10px;margin:10px 0}.truck-camera-dialog .actions{margin-top:12px}.truck-camera-dialog .btn{min-height:48px}.truck-camera-dialog .camera-tip{font-size:12px;color:#66758a;margin-top:10px}@media(max-width:600px){.truck-camera-modal{padding:7px}.truck-camera-dialog{padding:12px;border-radius:14px}.truck-camera-stage{min-height:190px}}</style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
 .gps-panel{border:1px solid var(--line);border-radius:14px;background:#fff;padding:16px;margin:14px 0}
@@ -958,6 +958,7 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
   </section>
 </main>
 
+<div id="truckCameraModal" class="truck-camera-modal" hidden role="dialog" aria-modal="true" aria-labelledby="truckCameraTitle"><div class="truck-camera-dialog"><h2 id="truckCameraTitle">Tomar fotografía</h2><p id="truckCameraSubtitle">Hino AT8811 · Control semanal</p><div id="truckCameraError" class="truck-camera-error" hidden></div><div id="truckCameraStage" class="truck-camera-stage"><video id="truckCameraVideo" autoplay muted playsinline></video><img id="truckCameraPreview" alt="Vista previa de la fotografía" hidden></div><div class="actions" id="truckCameraLiveActions"><button class="btn primary" id="truckCameraCapture" type="button">📸 Capturar fotografía</button><button class="btn secondary" id="truckCameraCancel" type="button">Cancelar</button></div><div class="actions" id="truckCameraPreviewActions" hidden><button class="btn secondary" id="truckCameraRetake" type="button">↻ Volver a tomar</button><button class="btn primary" id="truckCameraUse" type="button">✓ Usar esta fotografía</button></div><div class="camera-tip">Permite el acceso a la cámara cuando el navegador lo solicite. La fotografía no se guarda hasta que pulses «Usar esta fotografía».</div></div></div>
 <script>
 const SUPABASE_URL='https://stujfwqzbtbqfapmvpog.supabase.co';
 const SUPABASE_KEY='sb_publishable_RtUb5ukwLAWBKIwuGi09RQ_4lj3zscv';
@@ -2333,16 +2334,78 @@ function truckBuildCondition(id,p){$(id).innerHTML=TRUCK_PARTS.map((x,i)=>'<div 
 function truckCondition(p){const o={};TRUCK_PARTS.forEach((x,i)=>o[x]=$(p+i).value);return o}
 function truckNow(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
 function truckStatus(t,type=''){const e=$('truckHandoverStatus');e.hidden=false;e.textContent=t;e.className='status '+type}
+let truckCameraStream=null,truckCameraTarget=null,truckCameraDraftBlob=null,truckCameraDraftUrl=null,truckCameraFacing='environment';
 function truckBuildPhotoSlots(stage){
   const host=$(stage==='retiro'?'truckWithdrawalPhotos':'truckReturnPhotos');if(!host)return;
-  host.innerHTML=TRUCK_ANGLES.map(a=>'<div class="truck-camera-item"><button class="truck-camera-slot" type="button" data-truck-camera="'+stage+'" data-angle="'+a.id+'" aria-label="Tomar fotografía: '+a.label+'"><span class="camera-placeholder"><span class="camera-icon">📷</span><span>Tomar foto</span></span><strong>'+a.label+'</strong></button><input hidden type="file" id="truckPhoto_'+stage+'_'+a.id+'" accept="image/*" capture="environment"></div>').join('');
+  host.innerHTML=TRUCK_ANGLES.map(a=>'<div class="truck-camera-item"><button class="truck-camera-slot" type="button" data-truck-camera="'+stage+'" data-angle="'+a.id+'" aria-label="Abrir cámara: '+a.label+'"><span class="camera-placeholder"><span class="camera-icon">📷</span><span>Abrir cámara</span></span><strong>'+a.label+'</strong></button></div>').join('');
+}
+function truckRenderPhotoSlot(stage,angle){
+  const selection=truckPhotoSelections[stage][angle],button=document.querySelector('[data-truck-camera="'+stage+'"][data-angle="'+angle+'"]');if(!button)return;
+  const label=TRUCK_ANGLES.find(a=>a.id===angle)?.label||angle;
+  button.innerHTML=selection?.previewUrl?'<img src="'+selection.previewUrl+'" alt="'+label+'"><strong>'+label+'</strong><span class="camera-retake">✓ Foto capturada · repetir</span>':'<span class="camera-placeholder"><span class="camera-icon">📷</span><span>Abrir cámara</span></span><strong>'+label+'</strong>';
 }
 function truckClearPhotoSelections(stage){
   const stages=stage?[stage]:['retiro','entrega'];
-  stages.forEach(k=>{TRUCK_ANGLES.forEach(a=>{const f=truckPhotoSelections[k][a.id];if(f?.previewUrl)URL.revokeObjectURL(f.previewUrl);const input=$('truckPhoto_'+k+'_'+a.id);if(input)input.value='';});truckPhotoSelections[k]={};truckBuildPhotoSlots(k)});
+  stages.forEach(k=>{TRUCK_ANGLES.forEach(a=>{const f=truckPhotoSelections[k][a.id];if(f?.previewUrl)URL.revokeObjectURL(f.previewUrl)});truckPhotoSelections[k]={};truckBuildPhotoSlots(k)});
 }
-document.addEventListener('click',e=>{const button=e.target.closest('[data-truck-camera]');if(!button)return;const input=$('truckPhoto_'+button.dataset.truckCamera+'_'+button.dataset.angle);if(input){input.value='';input.click()}});
-document.addEventListener('change',e=>{const input=e.target;if(!input.id||!input.id.startsWith('truckPhoto_')||!input.files?.[0])return;const parts=input.id.split('_');const stage=parts[1],angle=parts.slice(2).join('_'),file=input.files[0];if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>10*1024*1024){input.value='';return truckStatus('Usa una foto JPG, PNG o WEBP de máximo 10 MB.','error')}const old=truckPhotoSelections[stage][angle];if(old?.previewUrl)URL.revokeObjectURL(old.previewUrl);const previewUrl=URL.createObjectURL(file);truckPhotoSelections[stage][angle]={file,previewUrl};const button=document.querySelector('[data-truck-camera="'+stage+'"][data-angle="'+angle+'"]');if(button){const label=TRUCK_ANGLES.find(a=>a.id===angle)?.label||angle;button.innerHTML='<img src="'+previewUrl+'" alt="'+label+'"><strong>'+label+'</strong><span class="camera-retake">✓ Capturada · tocar para repetir</span>'}});
+function truckStopCamera(){
+  if(truckCameraStream){truckCameraStream.getTracks().forEach(t=>t.stop());truckCameraStream=null}
+  const video=$('truckCameraVideo');if(video)video.srcObject=null;
+}
+function truckCloseCamera(){
+  truckStopCamera();if(truckCameraDraftUrl){URL.revokeObjectURL(truckCameraDraftUrl);truckCameraDraftUrl=null}
+  truckCameraDraftBlob=null;truckCameraTarget=null;$('truckCameraModal').hidden=true;
+}
+async function truckStartCamera(){
+  truckStopCamera();$('truckCameraError').hidden=true;$('truckCameraLiveActions').hidden=true;$('truckCameraPreviewActions').hidden=true;$('truckCameraPreview').hidden=true;$('truckCameraVideo').hidden=false;
+  if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){$('truckCameraError').hidden=false;$('truckCameraError').textContent='El navegador no permite abrir la cámara. Accede mediante HTTPS y utiliza un navegador actualizado.';$('truckCameraCancel').textContent='Cerrar';$('truckCameraLiveActions').hidden=false;return}
+  try{
+    truckCameraStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:truckCameraFacing},width:{ideal:1920},height:{ideal:1080}}});
+    const video=$('truckCameraVideo');video.srcObject=truckCameraStream;await video.play();$('truckCameraLiveActions').hidden=false;$('truckCameraCapture').disabled=false;$('truckCameraCancel').textContent='Cancelar';
+  }catch(err){
+    $('truckCameraError').hidden=false;
+    $('truckCameraError').textContent=err.name==='NotAllowedError'?'No se concedió permiso para usar la cámara. Autoriza la cámara en el navegador y vuelve a intentarlo.':err.name==='NotFoundError'?'Este dispositivo no tiene una cámara disponible.':'No se pudo abrir la cámara: '+(err.message||err.name);
+    $('truckCameraLiveActions').hidden=false;$('truckCameraCapture').disabled=true;$('truckCameraCancel').textContent='Cerrar';
+  }
+}
+async function truckOpenCamera(stage,angle){
+  truckCameraTarget={stage,angle};const label=TRUCK_ANGLES.find(a=>a.id===angle)?.label||angle;
+  $('truckCameraTitle').textContent=(stage==='retiro'?'Fotografía del retiro':'Fotografía de la entrega')+' · '+label;
+  $('truckCameraSubtitle').textContent='Hino AT8811 · '+(stage==='retiro'?'Recepción del camión':'Devolución del camión');
+  $('truckCameraModal').hidden=false;await truckStartCamera();
+}
+function truckCapturePhoto(){
+  const video=$('truckCameraVideo');if(!video.videoWidth||!video.videoHeight)return;
+  const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+  canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+  canvas.toBlob(blob=>{
+    if(!blob){$('truckCameraError').hidden=false;$('truckCameraError').textContent='No se pudo procesar la fotografía. Inténtalo nuevamente.';return}
+    truckCameraDraftBlob=blob;truckCameraDraftUrl=URL.createObjectURL(blob);truckStopCamera();
+    $('truckCameraVideo').hidden=true;$('truckCameraPreview').src=truckCameraDraftUrl;$('truckCameraPreview').hidden=false;
+    $('truckCameraLiveActions').hidden=true;$('truckCameraPreviewActions').hidden=false;
+  },'image/jpeg',0.9);
+}
+async function truckRetakePhoto(){
+  if(truckCameraDraftUrl){URL.revokeObjectURL(truckCameraDraftUrl);truckCameraDraftUrl=null}
+  truckCameraDraftBlob=null;await truckStartCamera();
+}
+function truckConfirmPhoto(){
+  if(!truckCameraTarget||!truckCameraDraftBlob)return;
+  const {stage,angle}=truckCameraTarget,label=TRUCK_ANGLES.find(a=>a.id===angle)?.label||angle;
+  const file=new File([truckCameraDraftBlob],'Hino_AT8811_'+stage+'_'+angle+'_'+Date.now()+'.jpg',{type:'image/jpeg',lastModified:Date.now()});
+  const old=truckPhotoSelections[stage][angle];if(old?.previewUrl)URL.revokeObjectURL(old.previewUrl);
+  const previewUrl=URL.createObjectURL(file);truckPhotoSelections[stage][angle]={file,previewUrl};
+  truckCloseCamera();truckRenderPhotoSlot(stage,angle);truckStatus('Fotografía confirmada: '+label+'.','ok');
+}
+document.addEventListener('click',e=>{
+  const button=e.target.closest('[data-truck-camera]');if(button)truckOpenCamera(button.dataset.truckCamera,button.dataset.angle);
+});
+$('truckCameraCapture').addEventListener('click',truckCapturePhoto);
+$('truckCameraRetake').addEventListener('click',truckRetakePhoto);
+$('truckCameraUse').addEventListener('click',truckConfirmPhoto);
+$('truckCameraCancel').addEventListener('click',truckCloseCamera);
+$('truckCameraModal').addEventListener('click',e=>{if(e.target===$('truckCameraModal'))truckCloseCamera()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('truckCameraModal').hidden)truckCloseCamera()});
 function truckValidateFiles(id){
   const stage=id==='truckWithdrawalPhotos'?'retiro':'entrega';
   const missing=TRUCK_ANGLES.filter(a=>!truckPhotoSelections[stage][a.id]?.file);

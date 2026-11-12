@@ -40,27 +40,3 @@
     visibility: visible !important;
   }
 }
-
-
-/* Vista de pantalla del reporte: elimina el contenedor gris y el efecto de hoja flotante. */
-@media screen {
-  #reportsView:not([hidden]) > #reportPreview { margin-top: 10px !important; }
-  #reportsView:not([hidden]) .report-preview-wrap {
-    background: transparent !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    overflow-x: auto !important;
-  }
-  #reportsView:not([hidden]) .report-page {
-    margin: 0 auto !important;
-    box-shadow: none !important;
-  }
-  @media (max-width: 900px) {
-    #reportsView:not([hidden]) .report-page {
-      width: min(8.5in, 100%) !important;
-      min-height: 0 !important;
-    }
-  }
-}

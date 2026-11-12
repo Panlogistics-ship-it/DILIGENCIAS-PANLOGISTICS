@@ -988,6 +988,7 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 </main>
 
 <div id="truckCameraModal" class="truck-camera-modal" hidden role="dialog" aria-modal="true" aria-labelledby="truckCameraTitle"><div class="truck-camera-dialog"><h2 id="truckCameraTitle">Tomar fotografía</h2><p id="truckCameraSubtitle">Hino AT8811 · Control semanal</p><div id="truckCameraError" class="truck-camera-error" hidden></div><div id="truckCameraStage" class="truck-camera-stage"><video id="truckCameraVideo" autoplay muted playsinline></video><img id="truckCameraPreview" alt="Vista previa de la fotografía" hidden></div><div class="actions" id="truckCameraLiveActions"><button class="btn primary" id="truckCameraCapture" type="button">📸 Capturar fotografía</button><button class="btn secondary" id="truckCameraCancel" type="button">Cancelar</button></div><div class="actions" id="truckCameraPreviewActions" hidden><button class="btn secondary" id="truckCameraRetake" type="button">↻ Volver a tomar</button><button class="btn primary" id="truckCameraUse" type="button">✓ Usar esta fotografía</button></div><div class="camera-tip">Permite el acceso a la cámara cuando el navegador lo solicite. La fotografía no se guarda hasta que pulses «Usar esta fotografía».</div></div></div>
+<script src="assets/js/modules/core-utils.js"></script>
 <script src="assets/js/modules/gps.js"></script>
 <script>
 const SUPABASE_URL='https://stujfwqzbtbqfapmvpog.supabase.co';
@@ -999,10 +1000,6 @@ const fields=['date','colaborador','departamento','cargo','destino','motivo','sa
 
 function msg(t,type=''){const el=$('status');if(el._toastTimer){clearTimeout(el._toastTimer);el._toastTimer=null;}el.hidden=false;el.textContent=t;el.className='status '+type}
 function toast(t,type='ok'){const el=$('status');if(el._toastTimer)clearTimeout(el._toastTimer);el.hidden=false;el.textContent=t;el.className='status toast '+type;el._toastTimer=setTimeout(()=>{el.hidden=true;el.className='status';el._toastTimer=null;},3200)}
-function today(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
-function dur(a,b){if(!a||!b)return 0;let [h,m]=a.split(':').map(Number),[x,y]=b.split(':').map(Number),n=x*60+y-h*60-m;if(n<0)n+=1440;return n/60}
-function money(n){return (Number(n)||0).toLocaleString('es-PA',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function tab(id){
   if(!canUseTab(id)) return;
   ['dashboardView','formView','listView','fuelView','evaluationView','incidentsView','resultsView','reportsView','exportView','settingsView','usersView','gpsView','truckHandoverView'].forEach(x=>{

@@ -1,0 +1,132 @@
+// Control semanal Hino AT8811
+const TRUCK_BUCKET='truck-handover-photos',TRUCK_PARTS=['Motor','Frenos','Luces','Llantas','Carrocería','Espejos','A/C'];let truckActiveRecord=null;
+const TRUCK_ANGLES=[{id:'frontal',label:'Parte delantera'},{id:'trasera',label:'Parte trasera'},{id:'lateral_izquierdo',label:'Lateral izquierdo'},{id:'lateral_derecho',label:'Lateral derecho'}];
+let truckPhotoSelections={retiro:{},entrega:{}};
+function truckBuildCondition(id,p){$(id).innerHTML=TRUCK_PARTS.map((x,i)=>'<div class="field"><label>'+x+'</label><select id="'+p+i+'" required><option value="">Seleccione</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>').join('')}
+function truckCondition(p){const o={};TRUCK_PARTS.forEach((x,i)=>o[x]=$(p+i).value);return o}
+function truckNow(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
+function truckStatus(t,type=''){const e=$('truckHandoverStatus');e.hidden=false;e.textContent=t;e.className='status '+type}
+let truckCameraStream=null,truckCameraTarget=null,truckCameraDraftBlob=null,truckCameraDraftUrl=null,truckCameraFacing='environment';
+function truckUpdatePhotoProgress(stage){
+  const total=TRUCK_ANGLES.filter(a=>truckPhotoSelections[stage][a.id]?.file).length;
+  const target=$(stage==='retiro'?'truckWithdrawalPhotoProgress':'truckReturnPhotoProgress');
+  if(target)target.textContent=total+' de 4 capturadas'+(total===4?' · Completo':'');
+}
+function truckBuildPhotoSlots(stage){
+  const host=$(stage==='retiro'?'truckWithdrawalPhotos':'truckReturnPhotos');if(!host)return;
+  host.innerHTML=TRUCK_ANGLES.map(a=>'<div class="truck-camera-item"><button class="truck-camera-slot" type="button" data-truck-camera="'+stage+'" data-angle="'+a.id+'" aria-label="Abrir cámara: '+a.label+'"><span class="camera-placeholder"><span class="camera-icon">📷</span><span>Toca para tomar foto</span></span><strong>'+a.label+'</strong></button></div>').join('');
+  truckUpdatePhotoProgress(stage);
+}
+function truckRenderPhotoSlot(stage,angle){
+  const selection=truckPhotoSelections[stage][angle],button=document.querySelector('[data-truck-camera="'+stage+'"][data-angle="'+angle+'"]');if(!button)return;
+  const label=TRUCK_ANGLES.find(a=>a.id===angle)?.label||angle;
+  button.innerHTML=selection?.previewUrl?'<img src="'+selection.previewUrl+'" alt="'+label+'"><strong>'+label+'</strong><span class="camera-retake">✓ Foto capturada · toca para repetir</span>':'<span class="camera-placeholder"><span class="camera-icon">📷</span><span>Toca para tomar foto</span></span><strong>'+label+'</strong>';
+  truckUpdatePhotoProgress(stage);
+}
+function truckClearPhotoSelections(stage){
+  const stages=stage?[stage]:['retiro','entrega'];
+  stages.forEach(k=>{TRUCK_ANGLES.forEach(a=>{const f=truckPhotoSelections[k][a.id];if(f?.previewUrl)URL.revokeObjectURL(f.previewUrl)});truckPhotoSelections[k]={};truckBuildPhotoSlots(k)});
+}
+function truckStopCamera(){
+  if(truckCameraStream){truckCameraStream.getTracks().forEach(t=>t.stop());truckCameraStream=null}
+  const video=$('truckCameraVideo');if(video)video.srcObject=null;
+}
+function truckCloseCamera(){
+  truckStopCamera();if(truckCameraDraftUrl){URL.revokeObjectURL(truckCameraDraftUrl);truckCameraDraftUrl=null}
+  truckCameraDraftBlob=null;truckCameraTarget=null;$('truckCameraModal').hidden=true;
+}
+async function truckStartCamera(){
+  truckStopCamera();$('truckCameraCapture').disabled=false;$('truckCameraError').hidden=true;$('truckCameraLiveActions').hidden=true;$('truckCameraPreviewActions').hidden=true;$('truckCameraPreview').hidden=true;$('truckCameraVideo').hidden=false;
+  if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){$('truckCameraError').hidden=false;$('truckCameraError').textContent='El navegador no permite abrir la cámara. Accede mediante HTTPS y utiliza un navegador actualizado.';$('truckCameraCancel').textContent='Cerrar';$('truckCameraLiveActions').hidden=false;return}
+  try{
+    truckCameraStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:truckCameraFacing},width:{ideal:1920},height:{ideal:1080}}});
+    const video=$('truckCameraVideo');video.srcObject=truckCameraStream;await video.play();$('truckCameraLiveActions').hidden=false;$('truckCameraCapture').disabled=false;$('truckCameraCancel').textContent='Cancelar';
+  }catch(err){
+    $('truckCameraError').hidden=false;
+    $('truckCameraError').textContent=err.name==='NotAllowedError'?'No se concedió permiso para usar la cámara. Autoriza la cámara en el navegador y vuelve a intentarlo.':err.name==='NotFoundError'?'Este dispositivo no tiene una cámara disponible.':'No se pudo abrir la cámara: '+(err.message||err.name);
+    $('truckCameraLiveActions').hidden=false;$('truckCameraCapture').disabled=true;$('truckCameraCancel').textContent='Cerrar';
+  }
+}
+async function truckOpenCamera(stage,angle){
+  truckCameraTarget={stage,angle};const label=TRUCK_ANGLES.find(a=>a.id===angle)?.label||angle;
+  $('truckCameraTitle').textContent=(stage==='retiro'?'Fotografía del retiro':'Fotografía de la entrega')+' · '+label;
+  $('truckCameraSubtitle').textContent='Hino AT8811 · '+(stage==='retiro'?'Recepción del camión':'Devolución del camión');
+  $('truckCameraModal').hidden=false;await truckStartCamera();
+}
+function truckCapturePhoto(){
+  const video=$('truckCameraVideo');if(!video.videoWidth||!video.videoHeight)return;
+  const canvas=document.createElement('canvas');canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+  canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+  canvas.toBlob(blob=>{
+    if(!blob){$('truckCameraError').hidden=false;$('truckCameraError').textContent='No se pudo procesar la fotografía. Inténtalo nuevamente.';return}
+    truckCameraDraftBlob=blob;truckCameraDraftUrl=URL.createObjectURL(blob);truckStopCamera();
+    $('truckCameraVideo').hidden=true;$('truckCameraPreview').src=truckCameraDraftUrl;$('truckCameraPreview').hidden=false;
+    $('truckCameraLiveActions').hidden=true;$('truckCameraPreviewActions').hidden=false;
+  },'image/jpeg',0.9);
+}
+async function truckRetakePhoto(){
+  if(truckCameraDraftUrl){URL.revokeObjectURL(truckCameraDraftUrl);truckCameraDraftUrl=null}
+  truckCameraDraftBlob=null;await truckStartCamera();
+}
+function truckConfirmPhoto(){
+  if(!truckCameraTarget||!truckCameraDraftBlob)return;
+  const {stage,angle}=truckCameraTarget,label=TRUCK_ANGLES.find(a=>a.id===angle)?.label||angle;
+  const file=new File([truckCameraDraftBlob],'Hino_AT8811_'+stage+'_'+angle+'_'+Date.now()+'.jpg',{type:'image/jpeg',lastModified:Date.now()});
+  const old=truckPhotoSelections[stage][angle];if(old?.previewUrl)URL.revokeObjectURL(old.previewUrl);
+  const previewUrl=URL.createObjectURL(file);truckPhotoSelections[stage][angle]={file,previewUrl};
+  truckCloseCamera();truckRenderPhotoSlot(stage,angle);truckStatus('Fotografía confirmada: '+label+'.','ok');
+}
+document.addEventListener('click',e=>{
+  const jump=e.target.closest('[data-truck-scroll]');
+  if(jump){
+    const target=$(jump.dataset.truckScroll);
+    if(target){
+      if(target.id==='truckReturnPanel'&&target.hidden){
+        truckStatus('Para completar una entrega, abre primero un control pendiente desde el historial.','');
+        $('truckHistoryPanel')?.scrollIntoView({behavior:'smooth',block:'start'});
+      }else target.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    return;
+  }
+  const button=e.target.closest('[data-truck-camera]');if(button)truckOpenCamera(button.dataset.truckCamera,button.dataset.angle);
+});
+$('truckCameraCapture').addEventListener('click',truckCapturePhoto);
+$('truckCameraRetake').addEventListener('click',truckRetakePhoto);
+$('truckCameraUse').addEventListener('click',truckConfirmPhoto);
+$('truckCameraCancel').addEventListener('click',truckCloseCamera);
+$('truckCameraModal').addEventListener('click',e=>{if(e.target===$('truckCameraModal'))truckCloseCamera()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('truckCameraModal').hidden)truckCloseCamera()});
+function truckValidateFiles(id){
+  const stage=id==='truckWithdrawalPhotos'?'retiro':'entrega';
+  const missing=TRUCK_ANGLES.filter(a=>!truckPhotoSelections[stage][a.id]?.file);
+  if(missing.length)throw Error('Faltan fotografías: '+missing.map(a=>a.label).join(', ')+'. Toca cada recuadro para abrir la cámara.');
+  const files=TRUCK_ANGLES.map(a=>truckPhotoSelections[stage][a.id].file);
+  for(const f of files){if(!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>10*1024*1024)throw Error('Formato no permitido o foto mayor de 10 MB.');if(Math.abs(Date.now()-f.lastModified)>15*60*1000)throw Error('Una foto no parece reciente. Tómala nuevamente con la cámara.')}
+  return files;
+}
+async function truckUpload(a,id,stage){const out=[];for(let i=0;i<a.length;i++){const f=a[i],ext=(f.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');const path=user.id+'/'+id+'/'+stage+'/'+Date.now()+'_'+i+'.'+ext;const {error}=await sb.storage.from(TRUCK_BUCKET).upload(path,f,{contentType:f.type});if(error)throw error;out.push(path)}return out}
+function truckReset(){ $('truckWithdrawalForm').reset();$('truckRecordId').value='';$('truckReturnPanel').hidden=true;truckActiveRecord=null;$('truckWithdrawalAt').value=truckNow();$('truckWeekStart').value=today();$('truckWeekEnd').value=today();truckBuildCondition('truckWithdrawalCondition','twc');truckBuildCondition('truckReturnCondition','trc');$('truckSaveWithdrawal').disabled=false;truckClearPhotoSelections()}
+async function truckSaveWithdrawal(e){e.preventDefault();try{const photos=truckValidateFiles('truckWithdrawalPhotos'),id=crypto.randomUUID(),c=truckCondition('twc');if(Object.values(c).some(x=>!x))throw Error('Completa el estado de todos los componentes.');const row={id,user_id:user.id,vehicle_plate:'AT8811',vehicle_make:'Hino',week_start:$('truckWeekStart').value,week_end:$('truckWeekEnd').value,withdrawal_at:new Date($('truckWithdrawalAt').value).toISOString(),withdrawal_place:$('truckWithdrawalPlace').value.trim(),withdrawal_km:Number($('truckWithdrawalKm').value),withdrawal_fuel:$('truckWithdrawalFuel').value,withdrawal_condition:c,withdrawal_observations:$('truckWithdrawalObs').value,received_by:$('truckReceivedBy').value.trim(),supervisor_name:$('truckSupervisor').value.trim()};if(!row.week_start||!row.week_end||row.week_end<row.week_start)throw Error('Verifica el rango de la semana.');truckStatus('Guardando fotografías del retiro…');row.withdrawal_photos=await truckUpload(photos,id,'retiro');row.withdrawal_photos_captured_at=new Date().toISOString();const {data,error}=await sb.from('truck_handover_records').insert(row).select('*').single();if(error)throw error;truckActiveRecord=data;$('truckRecordId').value=id;$('truckReturnPanel').hidden=false;$('truckSaveWithdrawal').disabled=true;truckStatus('Retiro guardado. Control N.º '+data.control_number+'. Completa la entrega al devolver el camión.','ok');await loadTruckHandoverRecords()}catch(x){truckStatus('No se pudo guardar: '+x.message,'error')}}
+async function truckOpenPending(id){const {data,error}=await sb.from('truck_handover_records').select('*').eq('id',id).single();if(error)return truckStatus(error.message,'error');if(data.return_at)return truckStatus('Este control ya está cerrado.');truckActiveRecord=data;truckClearPhotoSelections('entrega');$('truckReturnPanel').hidden=false;$('truckReturnAt').value=truckNow();$('truckDeliveredBy').value=currentProfile?.full_name||'';$('truckReturnReceivedBy').value=data.supervisor_name||'';truckStatus('Completando control N.º '+data.control_number);$('truckReturnPanel').scrollIntoView({behavior:'smooth'})}
+async function truckSaveReturn(){try{if(!truckActiveRecord)throw Error('Selecciona un control pendiente.');const photos=truckValidateFiles('truckReturnPhotos'),km=Number($('truckReturnKm').value),c=truckCondition('trc');if(Object.values(c).some(x=>!x))throw Error('Completa el estado de todos los componentes.');if(!$('truckReturnAt').value||!$('truckReturnPlace').value.trim()||!Number.isFinite(km)||km<truckActiveRecord.withdrawal_km||!$('truckReturnFuel').value||!$('truckDeliveredBy').value.trim()||!$('truckReturnReceivedBy').value.trim())throw Error('Completa fecha, lugar, kilometraje válido, combustible y nombres.');truckStatus('Guardando fotografías de entrega…');const paths=await truckUpload(photos,truckActiveRecord.id,'entrega');const patch={return_at:new Date($('truckReturnAt').value).toISOString(),return_place:$('truckReturnPlace').value.trim(),return_km:km,return_fuel:$('truckReturnFuel').value,return_condition:c,return_observations:$('truckReturnObs').value,return_photos:paths,return_photos_captured_at:new Date().toISOString(),delivered_by:$('truckDeliveredBy').value.trim(),received_by:$('truckReturnReceivedBy').value.trim()};const {error}=await sb.from('truck_handover_records').update(patch).eq('id',truckActiveRecord.id);if(error)throw error;truckStatus('Entrega guardada. Control semanal cerrado.','ok');truckReset();await loadTruckHandoverRecords()}catch(x){truckStatus('No se pudo cerrar la entrega: '+x.message,'error')}}
+async function truckSigned(paths){const a=[];for(const p of paths||[]){const {data}=await sb.storage.from(TRUCK_BUCKET).createSignedUrl(p,3600);if(data?.signedUrl)a.push(data.signedUrl)}return a}
+async function truckShowEvidence(id){const {data:r,error}=await sb.from('truck_handover_records').select('*').eq('id',id).single();if(error)return msg(error.message,'error');const [a,b]=await Promise.all([truckSigned(r.withdrawal_photos),truckSigned(r.return_photos)]);const im=x=>x.length?'<div class="truck-photo-grid">'+x.map(u=>'<a href="'+u+'" target="_blank" rel="noopener"><img src="'+u+'" alt="Evidencia"></a>').join('')+'</div>':'<p class="hint">Sin fotos.</p>';const el=$('truckEvidence_'+id);el.innerHTML='<div class="truck-section"><b>Fotos del retiro</b>'+im(a)+'<p>Estado: '+esc(JSON.stringify(r.withdrawal_condition))+'</p><p>Observaciones: '+esc(r.withdrawal_observations||'—')+'</p><b>Fotos de la entrega</b>'+im(b)+'<p>Estado: '+esc(JSON.stringify(r.return_condition||{}))+'</p><p>Observaciones: '+esc(r.return_observations||'—')+'</p></div>'}
+// Reporte independiente del control del camión. No utiliza ni modifica el reporte quincenal.
+async function truckPrintReport(id){
+  const win=window.open('','_blank');
+  if(!win){truckStatus('El navegador bloqueó la ventana del reporte. Permite ventanas emergentes para este sitio.','error');return}
+  win.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte de control Hino AT8811</title></head><body style="font:16px Arial;padding:24px">Preparando reporte del camión…</body></html>');
+  try{
+    const {data:r,error}=await sb.from('truck_handover_records').select('*').eq('id',id).single();
+    if(error)throw error;
+    const [withdrawalUrls,returnUrls]=await Promise.all([truckSigned(r.withdrawal_photos||[]),truckSigned(r.return_photos||[])]);
+    const conditionHtml=c=>{const entries=Object.entries(c||{});return entries.length?'<table><thead><tr><th>Componente</th><th>Estado registrado</th></tr></thead><tbody>'+entries.map(([k,v])=>'<tr><td>'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('')+'</tbody></table>':'<p>No se registró evaluación.</p>'};
+    const photosHtml=(urls,label)=>urls.length?'<div class="photos">'+urls.map((u,i)=>'<figure><img src="'+u+'" alt="'+esc(label)+' '+(i+1)+'"><figcaption>'+esc(label)+' · '+(i+1)+'</figcaption></figure>').join('')+'</div>':'<p class="muted">No hay fotografías registradas en esta etapa.</p>';
+    const date=v=>v?new Date(v).toLocaleString('es-PA'):'Pendiente';
+    const status=r.return_at?'CONTROL CERRADO':'PENDIENTE DE ENTREGA';
+    const html='<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Control semanal Hino AT8811 · '+esc(r.control_number)+'</title><style>@page{size:Letter portrait;margin:14mm}*{box-sizing:border-box}body{font:11px Arial,sans-serif;color:#172b45;margin:0}header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #08734c;padding-bottom:12px;margin-bottom:18px}h1{font-size:20px;margin:0;color:#073f30}h2{font-size:14px;background:#17334d;color:#fff;padding:8px 10px;margin:18px 0 8px;border-left:5px solid #e2b638}h3{font-size:12px;color:#07563e;margin:12px 0 6px}.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.cell{border:1px solid #d6dee8;border-radius:6px;padding:8px}.cell b{display:block;font-size:9px;color:#68778b;text-transform:uppercase;margin-bottom:4px}.pill{display:inline-block;background:#eaf3ee;color:#07563e;border-radius:20px;padding:5px 9px;font-weight:bold}table{width:100%;border-collapse:collapse;margin:6px 0 12px}th,td{border:1px solid #d4dce6;padding:6px;text-align:left}th{background:#e7edf3}.photos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.photos figure{margin:0;border:1px solid #d6dee8;padding:6px;break-inside:avoid}.photos img{width:100%;height:190px;object-fit:contain;background:#f4f6f8}.photos figcaption{font-size:9px;color:#52647a;margin-top:4px}.muted{color:#69778a}.obs{border:1px solid #d6dee8;padding:8px;min-height:34px;white-space:pre-wrap}.signs{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin:38px 10px 10px}.sign{border-top:1px solid #52647a;text-align:center;padding-top:7px}.foot{border-top:1px solid #d6dee8;margin-top:20px;padding-top:7px;color:#7b8795;font-size:9px;display:flex;justify-content:space-between}@media print{button{display:none}}</style></head><body><header><div><h1>PANLOGISTICS GROUP, S.A.</h1><div>Acta de recepción y entrega · Control de flota</div></div><div style="text-align:right"><b>REPORTE DEL CAMIÓN</b><br>Control N.º '+esc(r.control_number||'—')+'<br><span class="pill">'+status+'</span></div></header><div class="meta"><div class="cell"><b>Vehículo</b>Hino · Placa AT8811</div><div class="cell"><b>Semana</b>'+esc(r.week_start)+' al '+esc(r.week_end)+'</div><div class="cell"><b>Responsable del registro</b>'+esc(currentProfile?.full_name||'—')+'</div></div><h2>1. RECEPCIÓN / RETIRO DEL CAMIÓN</h2><div class="meta"><div class="cell"><b>Fecha y hora</b>'+date(r.withdrawal_at)+'</div><div class="cell"><b>Lugar</b>'+esc(r.withdrawal_place||'—')+'</div><div class="cell"><b>Kilometraje</b>'+esc(r.withdrawal_km)+' km</div><div class="cell"><b>Combustible</b>'+esc(r.withdrawal_fuel||'—')+'</div><div class="cell"><b>Quien recibe</b>'+esc(r.received_by||'—')+'</div><div class="cell"><b>Supervisor</b>'+esc(r.supervisor_name||'—')+'</div></div><h3>Estado del vehículo al recibir</h3>'+conditionHtml(r.withdrawal_condition)+'<h3>Observaciones de recepción</h3><div class="obs">'+esc(r.withdrawal_observations||'Sin observaciones')+'</div><h3>Evidencia fotográfica del retiro</h3>'+photosHtml(withdrawalUrls,'Retiro')+'<h2>2. DEVOLUCIÓN / ENTREGA DEL CAMIÓN</h2>'+(r.return_at?'<div class="meta"><div class="cell"><b>Fecha y hora</b>'+date(r.return_at)+'</div><div class="cell"><b>Lugar</b>'+esc(r.return_place||'—')+'</div><div class="cell"><b>Kilometraje</b>'+esc(r.return_km)+' km</div><div class="cell"><b>Combustible</b>'+esc(r.return_fuel||'—')+'</div><div class="cell"><b>Quien entrega</b>'+esc(r.delivered_by||'—')+'</div><div class="cell"><b>Quien recibe</b>'+esc(r.received_by||'—')+'</div></div><h3>Estado del vehículo al entregar</h3>'+conditionHtml(r.return_condition)+'<h3>Observaciones de entrega</h3><div class="obs">'+esc(r.return_observations||'Sin observaciones')+'</div><h3>Evidencia fotográfica de la entrega</h3>'+photosHtml(returnUrls,'Entrega'):'<p class="obs">La devolución todavía no ha sido registrada. Este documento refleja únicamente el retiro del camión.</p>')+'<div class="signs"><div class="sign">Firma de quien entrega</div><div class="sign">Firma de quien recibe / supervisor</div></div><div class="foot"><span>Documento interno · PANLOGISTICS GROUP, S.A.</span><span>Generado: '+new Date().toLocaleString('es-PA')+'</span></div></body></html>';
+    win.document.open();win.document.write(html);win.document.close();const imgs=[...win.document.images];Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=img.onerror=resolve}))).then(()=>setTimeout(()=>win.print(),350));
+  }catch(err){win.close();truckStatus('No se pudo preparar el reporte del camión: '+err.message,'error')}
+}
+async function loadTruckHandoverRecords(){if(!(isAdmin()||isOperator()))return;const {data,error}=await sb.from('truck_handover_records').select('*').order('week_start',{ascending:false}).limit(100);if(error){$('truckRecordsList').innerHTML='<div class="status error">'+esc(error.message)+'</div>';return}const rows=data||[],names={};const reportSelect=$('truckReportRecordSelect'),reportButton=$('truckGenerateReport'),reportHint=$('truckReportHint');if(reportSelect){reportSelect.innerHTML=rows.length?'<option value="">Selecciona un control semanal</option>'+rows.map(r=>'<option value="'+esc(r.id)+'">Control N.º '+esc(r.control_number)+' · '+esc(r.week_start)+' al '+esc(r.week_end)+(r.return_at?' · Cerrado':' · Pendiente')+'</option>').join(''):'<option value="">Todavía no hay controles guardados</option>';reportSelect.disabled=!rows.length;if(reportButton)reportButton.disabled=!rows.length;if(reportHint)reportHint.textContent=rows.length?'Selecciona un control y genera su reporte PDF independiente.':'Al guardar el primer retiro, aparecerá aquí para generar su reporte con fotografías y datos.';}if(isAdmin()&&rows.length){const {data:p}=await sb.from('profiles').select('id,full_name').in('id',[...new Set(rows.map(x=>x.user_id))]);(p||[]).forEach(x=>names[x.id]=x.full_name)}$('truckRecordsList').innerHTML=rows.length?rows.map(r=>'<article class="truck-record"><div class="truck-record-head"><strong>Control N.º '+r.control_number+' · Hino AT8811</strong><span class="badge '+(r.return_at?'ok':'warn')+'">'+(r.return_at?'CERRADO':'PENDIENTE DE ENTREGA')+'</span></div><p class="hint">Semana '+esc(r.week_start)+' al '+esc(r.week_end)+' · '+esc(names[r.user_id]||currentProfile?.full_name||'Operador')+'</p><p class="hint">Retiro: '+new Date(r.withdrawal_at).toLocaleString('es-PA')+' · Km '+r.withdrawal_km+' · '+esc(r.withdrawal_fuel)+'</p>'+(r.return_at?'<p class="hint">Entrega: '+new Date(r.return_at).toLocaleString('es-PA')+' · Km '+r.return_km+' · '+esc(r.return_fuel)+'</p>':'<p class="hint">Entrega pendiente.</p>')+'<div class="actions">'+(!r.return_at?'<button class="btn gold" type="button" onclick="truckOpenPending(\''+r.id+'\')">Completar entrega</button>':'')+'<button class="btn secondary" type="button" onclick="truckShowEvidence(\''+r.id+'\')">Ver fotografías y detalles</button><button class="btn primary" type="button" onclick="truckPrintReport(\''+r.id+'\')">🖨️ Reporte PDF del camión</button></div><div id="truckEvidence_'+r.id+'"></div></article>').join(''):'<div class="empty">Todavía no hay controles semanales.</div>'}
+$('truckGenerateReport')?.addEventListener('click',()=>{const id=$('truckReportRecordSelect')?.value;if(!id){truckStatus('Selecciona un control semanal para generar el reporte.','error');return}truckPrintReport(id)});$('truckWithdrawalForm')?.addEventListener('submit',truckSaveWithdrawal);$('truckSaveReturn')?.addEventListener('click',truckSaveReturn);$('truckResetForm')?.addEventListener('click',truckReset);$('truckRefresh')?.addEventListener('click',loadTruckHandoverRecords);truckBuildCondition('truckWithdrawalCondition','twc');truckBuildCondition('truckReturnCondition','trc');truckBuildPhotoSlots('retiro');truckBuildPhotoSlots('entrega');truckReset();

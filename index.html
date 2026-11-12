@@ -632,6 +632,49 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 @media(max-width:700px){#gpsMap{height:340px}.gps-operator-actions .btn{flex:1}}
 </style>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style id="panlogistics-reports-screen-override">
+/* Corrección definitiva de visibilidad en pantalla: no afecta la impresión PDF. */
+@media screen {
+  body main #app #reportsView:not([hidden]) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    grid-column: 2 !important;
+    order: 3 !important;
+  }
+  body main #app #reportsView:not([hidden]) > .report-controls,
+  body main #app #reportsView:not([hidden]) > #reportPreview {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  body main #app #reportsView:not([hidden]) > .report-controls .grid {
+    display: grid !important;
+    visibility: visible !important;
+  }
+  body main #app #reportsView:not([hidden]) > .report-controls .actions {
+    display: flex !important;
+    visibility: visible !important;
+  }
+  body main #app #reportsView:not([hidden]) > .report-controls h2,
+  body main #app #reportsView:not([hidden]) > .report-controls p,
+  body main #app #reportsView:not([hidden]) > .report-controls label,
+  body main #app #reportsView:not([hidden]) > .report-controls input,
+  body main #app #reportsView:not([hidden]) > .report-controls select,
+  body main #app #reportsView:not([hidden]) > .report-controls button {
+    visibility: visible !important;
+  }
+}
+</style>
 </head>
 <body>
 <header>
@@ -954,8 +997,7 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
           <div class="field"><label>Mensajero</label><select id="resultCollaborator"></select></div>
         </div>
         <div class="actions"><button class="btn secondary" id="loadResults" type="button">Actualizar resultados</button></div>
-      </div>
-      <div id="resultsContent">
+      </div>      <div id="resultsContent">
         <div class="empty">Selecciona un mes y un mensajero para consultar el resultado.</div>
       </div>
     </section>
@@ -1015,10 +1057,12 @@ function tab(id){
     else {view.style.removeProperty('display');view.style.removeProperty('visibility');}
   });
   if(id==='reportsView'){
-    const controls=$('reportsView')?.querySelector('.report-controls');
-    if(controls){controls.hidden=false;controls.style.setProperty('display','block','important');controls.style.setProperty('visibility','visible','important');}
+    const reports=$('reportsView');
+    if(reports){reports.hidden=false;reports.removeAttribute('hidden');reports.style.setProperty('display','block','important');reports.style.setProperty('visibility','visible','important');}
+    const controls=reports?.querySelector('.report-controls');
+    if(controls){controls.hidden=false;controls.removeAttribute('hidden');controls.style.setProperty('display','block','important');controls.style.setProperty('visibility','visible','important');controls.style.setProperty('opacity','1','important');}
     const preview=$('reportPreview');
-    if(preview){preview.hidden=false;preview.style.setProperty('display','block','important');}
+    if(preview){preview.hidden=false;preview.removeAttribute('hidden');preview.style.setProperty('display','block','important');preview.style.setProperty('visibility','visible','important');}
   }
   requestAnimationFrame(()=>$(id)?.scrollIntoView({behavior:'smooth',block:'start'}));
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
@@ -1952,8 +1996,7 @@ function formatDiligenceOption(d,p,ev){
 async function loadEvaluationData(){
   if(!user)return;
   await loadProfiles();
-  fillCollaboratorSelects();
-  const {data:allDiligencias,error:dErr}=await sb.from('diligencias').select('id,date,month,q,colaborador,colaborador_id,evaluador_id,destino,motivo,salida,regreso,obs,aprob,operational_status,started_at,finished_at').order('date',{ascending:false}).limit(2000);
+  fillCollaboratorSelects();  const {data:allDiligencias,error:dErr}=await sb.from('diligencias').select('id,date,month,q,colaborador,colaborador_id,evaluador_id,destino,motivo,salida,regreso,obs,aprob,operational_status,started_at,finished_at').order('date',{ascending:false}).limit(2000);
   if(dErr){$('evaluationPendingList').innerHTML='<div class="empty">No se pudieron cargar las diligencias asignadas.</div>';return}
   const {data:evs,error:eErr}=await sb.from('evaluaciones').select('*').order('created_at',{ascending:false}).limit(2000);
   if(eErr){$('evaluationList').innerHTML='<div class="empty">No se pudieron cargar las evaluaciones.</div>';return}

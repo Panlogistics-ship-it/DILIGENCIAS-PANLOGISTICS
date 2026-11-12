@@ -621,16 +621,7 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 }
 </style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-<style>
-.gps-panel{border:1px solid var(--line);border-radius:14px;background:#fff;padding:16px;margin:14px 0}
-.gps-status{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:30px;background:#edf2f7;font-weight:800;font-size:12px}
-.gps-status.on{background:#e7f7ed;color:#12643e}.gps-status.off{background:#fff3e8;color:#8a4b12}
-#gpsMap{height:430px;min-height:300px;border-radius:12px;border:1px solid var(--line);z-index:1}
-.gps-history{display:grid;gap:8px}.gps-history-item{padding:10px 12px;border:1px solid var(--line);border-radius:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.gps-operator-card{border:2px solid #2c8a60;background:linear-gradient(120deg,#f3fff7,#fff);border-radius:15px;padding:16px;margin:12px 0}
-.gps-operator-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-@media(max-width:700px){#gpsMap{height:340px}.gps-operator-actions .btn{flex:1}}
-</style>
+<link rel="stylesheet" href="assets/css/gps.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <style id="panlogistics-reports-screen-override">
 /* Corrección definitiva de visibilidad en pantalla: no afecta la impresión PDF. */

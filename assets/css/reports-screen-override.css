@@ -1,0 +1,42 @@
+
+/* Corrección definitiva de visibilidad en pantalla: no afecta la impresión PDF. */
+@media screen {
+  body main #app #reportsView:not([hidden]) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    grid-column: 2 !important;
+    order: 3 !important;
+  }
+  body main #app #reportsView:not([hidden]) > .report-controls,
+  body main #app #reportsView:not([hidden]) > #reportPreview {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  body main #app #reportsView:not([hidden]) > .report-controls .grid {
+    display: grid !important;
+    visibility: visible !important;
+  }
+  body main #app #reportsView:not([hidden]) > .report-controls .actions {
+    display: flex !important;
+    visibility: visible !important;
+  }
+  body main #app #reportsView:not([hidden]) > .report-controls h2,
+  body main #app #reportsView:not([hidden]) > .report-controls p,
+  body main #app #reportsView:not([hidden]) > .report-controls label,
+  body main #app #reportsView:not([hidden]) > .report-controls input,
+  body main #app #reportsView:not([hidden]) > .report-controls select,
+  body main #app #reportsView:not([hidden]) > .report-controls button {
+    visibility: visible !important;
+  }
+}

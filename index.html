@@ -1053,8 +1053,8 @@ const $=id=>document.getElementById(id);
 let sb=null,user=null,editing=null,activeFormDiligenceId=null,records=[],profiles=[],currentProfile=null,vehicles=[],fuelRecords=[];
 const fields=['date','colaborador','departamento','cargo','destino','motivo','salida','regreso','sobre','viatico','codigo','supervisor','obs'];
 
-function msg(t,type=''){const el=$('status');el.hidden=false;el.textContent=t;el.className='status '+type}
-function toast(t,type='ok'){const el=$('status');if(el._toastTimer)clearTimeout(el._toastTimer);el.hidden=false;el.textContent=t;el.className='status toast '+type;el._toastTimer=setTimeout(()=>{el.hidden=true;el.className='status';},3200)}
+function msg(t,type=''){const el=$('status');if(el._toastTimer){clearTimeout(el._toastTimer);el._toastTimer=null;}el.hidden=false;el.textContent=t;el.className='status '+type}
+function toast(t,type='ok'){const el=$('status');if(el._toastTimer)clearTimeout(el._toastTimer);el.hidden=false;el.textContent=t;el.className='status toast '+type;el._toastTimer=setTimeout(()=>{el.hidden=true;el.className='status';el._toastTimer=null;},3200)}
 function today(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function dur(a,b){if(!a||!b)return 0;let [h,m]=a.split(':').map(Number),[x,y]=b.split(':').map(Number),n=x*60+y-h*60-m;if(n<0)n+=1440;return n/60}
 function money(n){return (Number(n)||0).toLocaleString('es-PA',{minimumFractionDigits:2,maximumFractionDigits:2})}

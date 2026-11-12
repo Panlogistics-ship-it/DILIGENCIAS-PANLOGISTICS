@@ -676,37 +676,7 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 }
 </style>
 
-<style id="panlogistics-reports-workspace-layout">
-/* Presentación del módulo Reportes PDF. No modifica consultas, cálculos ni plantilla de impresión. */
-@media screen {
-#app > #reportsView:not([hidden]){display:flex!important;flex-direction:column!important;gap:16px!important;grid-column:2!important;width:100%!important;min-width:0!important;align-self:start!important}
-#reportsView .reports-module-heading{display:flex;align-items:center;gap:16px;width:100%;padding:22px 24px;border:1px solid rgba(255,255,255,.75);border-radius:16px;background:linear-gradient(120deg,rgba(255,255,255,.98),rgba(246,250,248,.97));box-shadow:0 8px 24px rgba(13,42,34,.10)}
-#reportsView .reports-module-icon{display:grid;place-items:center;flex:0 0 54px;height:54px;border-radius:14px;background:#e8f3ed;font-size:26px}
-#reportsView .reports-eyebrow{display:block;margin-bottom:4px;color:#16794b;font-size:10px;font-weight:850;letter-spacing:1.4px}
-#reportsView .reports-module-heading h2{margin:0 0 4px;color:#123c2e;font-size:clamp(19px,2vw,25px)}
-#reportsView .reports-module-heading p{margin:0;color:#647386;font-size:13px}
-#reportsView > .report-controls{display:block!important;width:100%!important;min-height:0!important;padding:22px!important;background:rgba(255,255,255,.98)!important;border:1px solid #e1e9e5!important;border-radius:16px!important;box-shadow:0 7px 22px rgba(13,42,34,.09)!important}
-#reportsView > .report-controls .grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
-#reportsView > .report-controls .field{min-width:0!important}
-#reportsView > .report-controls .actions{display:flex!important;flex-wrap:wrap!important;gap:10px!important;margin-top:16px!important}
-#reportsView > #reportPreview{display:block!important;width:100%!important;min-height:110px!important;padding:0!important}
-#reportsView > #reportPreview > .empty{padding:28px 20px;border:1px dashed #cbd8d1;border-radius:14px;background:rgba(255,255,255,.94);color:#647386;text-align:center}
-}
-@media screen and (max-width:760px){#reportsView .reports-module-heading{padding:16px;align-items:flex-start}#reportsView .reports-module-icon{flex-basis:44px;height:44px;font-size:22px}#reportsView > .report-controls{padding:16px!important}#reportsView > .report-controls .grid{grid-template-columns:minmax(0,1fr)!important}#reportsView > .report-controls .actions .btn{flex:1 1 100%}}
-@media print{#reportsView .reports-module-heading{display:none!important}}
 
-/* Corrección de posición: Reportes PDF debe ocupar la primera fila de contenido junto al menú. */
-@media screen and (min-width:701px){
-  #app{align-content:start!important;grid-auto-rows:min-content!important}
-  #app > #reportsView:not([hidden]){grid-row:3!important;align-self:start!important;margin-block-start:0!important;padding-block-start:0!important;transform:none!important}
-  #app > .tabs{grid-row:3!important;align-self:start!important}
-  #reportsView .reports-module-heading{margin-top:0!important}
-}
-@media screen and (max-width:700px){
-  #app > #reportsView:not([hidden]){order:3!important;margin-top:0!important;padding-top:0!important;transform:none!important}
-  #reportsView .reports-module-heading{margin-top:0!important}
-}
-</style>
 </head>
 <body>
 <header>
@@ -1037,7 +1007,6 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 
 
     <section id="reportsView" hidden>
-      <div class="reports-module-heading"><div class="reports-module-icon" aria-hidden="true">📄</div><div><span class="reports-eyebrow">CENTRO DE DOCUMENTOS</span><h2>Reportes de productividad</h2><p>Selecciona el período y el colaborador para preparar el informe quincenal.</p></div></div>
       <div class="panel report-controls">
         <h2>Reporte quincenal de productividad</h2>
         <p class="hint">Formato Carta · vertical · listo para imprimir o guardar como PDF. La quincena se calcula como días 1–15 o 16–fin del mes.</p>

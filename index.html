@@ -1017,7 +1017,7 @@ function tab(id){
     const preview=$('reportPreview');
     if(preview){preview.hidden=false;preview.removeAttribute('hidden');preview.style.setProperty('display','block','important');preview.style.setProperty('visibility','visible','important');}
   }
-  requestAnimationFrame(()=>$(id)?.scrollIntoView({behavior:'smooth',block:'start'}));
+  requestAnimationFrame(()=>{if(id==='dashboardView'){window.scrollTo({top:0,behavior:'auto'});return;}$(id)?.scrollIntoView({behavior:'smooth',block:'start'});});
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
   if(id==='dashboardView')loadRecords();
   if(id==='listView')loadRecords();

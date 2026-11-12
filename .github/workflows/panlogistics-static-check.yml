@@ -48,3 +48,35 @@ jobs:
               raise SystemExit(1)
           print(f"Correcto: {len(scripts)} etiquetas script revisadas; todos los archivos locales existen.")
           PY
+
+      - name: Verificar orden de carga de los modulos
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall('<script +src="([^"]+)"', html, flags=re.I)
+          positions = {src: i for i, src in enumerate(scripts)}
+          dependencies = [
+              ("assets/js/modules/core-utils.js", "assets/js/app.js"),
+              ("assets/js/modules/dashboard.js", "assets/js/modules/dashboard-widgets.js"),
+              ("assets/js/modules/dashboard-widgets.js", "assets/js/modules/productivity.js"),
+              ("assets/js/modules/people-incidents.js", "assets/js/modules/incidents.js"),
+              ("assets/js/modules/fleet-fuel.js", "assets/js/modules/fuel-management.js"),
+              ("assets/js/modules/truck-camera.js", "assets/js/modules/truck-handover.js"),
+              ("assets/js/modules/truck-handover.js", "assets/js/modules/truck-report.js"),
+              ("assets/js/modules/report-output.js", "assets/js/bootstrap.js"),
+          ]
+          errors = []
+          for before, after in dependencies:
+              if before not in positions or after not in positions or positions[before] >= positions[after]:
+                  errors.append(f"Orden incorrecto o modulo ausente: {before} debe cargar antes de {after}")
+          if scripts[-1] != "assets/js/bootstrap.js":
+              errors.append("bootstrap.js debe ser el ultimo script local de la aplicacion.")
+          if errors:
+              print("\\n".join(errors))
+              raise SystemExit(1)
+          print("Correcto: dependencias principales y bootstrap.js estan en el orden esperado.")
+          PY

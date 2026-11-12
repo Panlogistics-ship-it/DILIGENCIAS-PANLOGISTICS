@@ -677,6 +677,14 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 </style>
 
 
+
+<style id="panlogistics-compact-notices">
+.app-brand-title-row{display:flex;align-items:center;gap:11px;flex-wrap:wrap}.app-brand-title-row h1{margin:0}
+.app-info{position:relative;display:inline-flex;align-items:center;z-index:40}.app-info summary{list-style:none;display:grid;place-items:center;width:25px;height:25px;border:1px solid rgba(255,255,255,.72);border-radius:50%;color:#fff;background:rgba(255,255,255,.12);font-size:15px;font-weight:800;cursor:pointer;user-select:none}.app-info summary::-webkit-details-marker{display:none}.app-info[open] summary{background:#f5d36e;color:#12372b;border-color:#f5d36e}
+.app-info-popover{position:absolute;top:calc(100% + 9px);left:0;width:min(330px,calc(100vw - 44px));padding:12px 14px;border:1px solid #dce8e1;border-radius:10px;background:#fff;color:#30443b;box-shadow:0 10px 28px rgba(0,0,0,.2);font-size:12px;line-height:1.5;font-weight:500}
+.status.toast{position:fixed;top:14px;right:14px;z-index:10000;width:min(340px,calc(100vw - 28px));margin:0;padding:9px 13px;border:1px solid #cfe5d8;border-radius:10px;background:#f0faf4;color:#17633d;box-shadow:0 8px 24px rgba(0,0,0,.16);font-size:12px;line-height:1.4}
+@media(max-width:700px){.app-info-popover{left:auto;right:0}.status.toast{top:10px;right:10px;width:min(310px,calc(100vw - 20px))}}
+</style>
 </head>
 <body>
 <header>
@@ -718,11 +726,11 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
   <section id="app" hidden>
     <div class="app-brand-header" aria-label="Encabezado de PANLOGISTICS">
       <div class="app-brand-eyebrow">PANLOGISTICS GROUP, S.A.</div>
-      <h1>Control de Diligencias</h1>
+      <div class="app-brand-title-row"><h1>Control de Diligencias</h1><details class="app-info"><summary aria-label="Información sobre almacenamiento y conexión" title="Información">i</summary><div class="app-info-popover">Los registros se guardan en una base de datos compartida y se consultan desde los dispositivos autorizados. Se requiere conexión a internet para guardar o actualizar la información.</div></details></div>
       <p>Registro operativo · Acceso autorizado desde celular y computadora</p>
       <span class="app-brand-rule"></span>
     </div>
-    <div class="notice">Los registros se guardan en una base de datos compartida y se consultan desde los dispositivos autorizados. Se requiere internet para guardar o actualizar.</div>
+    
 
     <div class="topbar">
       <div id="sessionUser" class="topbar-user">Sesión activa<span>Usuario autenticado</span></div>
@@ -1046,6 +1054,7 @@ let sb=null,user=null,editing=null,activeFormDiligenceId=null,records=[],profile
 const fields=['date','colaborador','departamento','cargo','destino','motivo','salida','regreso','sobre','viatico','codigo','supervisor','obs'];
 
 function msg(t,type=''){const el=$('status');el.hidden=false;el.textContent=t;el.className='status '+type}
+function toast(t,type='ok'){const el=$('status');if(el._toastTimer)clearTimeout(el._toastTimer);el.hidden=false;el.textContent=t;el.className='status toast '+type;el._toastTimer=setTimeout(()=>{el.hidden=true;el.className='status';},3200)}
 function today(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function dur(a,b){if(!a||!b)return 0;let [h,m]=a.split(':').map(Number),[x,y]=b.split(':').map(Number),n=x*60+y-h*60-m;if(n<0)n+=1440;return n/60}
 function money(n){return (Number(n)||0).toLocaleString('es-PA',{minimumFractionDigits:2,maximumFractionDigits:2})}
@@ -1519,7 +1528,7 @@ async function loadRecords(){
   if(!sb||!user)return;
   let {data,error}=await sb.from('diligencias').select('*').order('date',{ascending:false}).limit(2000);
   if(error){msg('Error al consultar: '+error.message,'error');return}
-  records=data||[];render();renderDashboard();loadDashboardExtras();loadProductivityBonusDashboard();updateFormOperationalButtons();msg(`Historial actualizado (${records.length} registros).`,'ok');
+  records=data||[];render();renderDashboard();loadDashboardExtras();loadProductivityBonusDashboard();updateFormOperationalButtons();toast(`Historial actualizado (${records.length} registros).`,'ok');
 }
 function renderDashboard(){
   const all=records||[];const now=today();const active=all.filter(x=>String(x.aprob||'').toUpperCase()!=='ANULADO');

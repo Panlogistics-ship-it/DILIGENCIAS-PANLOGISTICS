@@ -694,6 +694,18 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 }
 @media screen and (max-width:760px){#reportsView .reports-module-heading{padding:16px;align-items:flex-start}#reportsView .reports-module-icon{flex-basis:44px;height:44px;font-size:22px}#reportsView > .report-controls{padding:16px!important}#reportsView > .report-controls .grid{grid-template-columns:minmax(0,1fr)!important}#reportsView > .report-controls .actions .btn{flex:1 1 100%}}
 @media print{#reportsView .reports-module-heading{display:none!important}}
+
+/* Corrección de posición: Reportes PDF debe ocupar la primera fila de contenido junto al menú. */
+@media screen and (min-width:701px){
+  #app{align-content:start!important;grid-auto-rows:min-content!important}
+  #app > #reportsView:not([hidden]){grid-row:3!important;align-self:start!important;margin-block-start:0!important;padding-block-start:0!important;transform:none!important}
+  #app > .tabs{grid-row:3!important;align-self:start!important}
+  #reportsView .reports-module-heading{margin-top:0!important}
+}
+@media screen and (max-width:700px){
+  #app > #reportsView:not([hidden]){order:3!important;margin-top:0!important;padding-top:0!important;transform:none!important}
+  #reportsView .reports-module-heading{margin-top:0!important}
+}
 </style>
 </head>
 <body>

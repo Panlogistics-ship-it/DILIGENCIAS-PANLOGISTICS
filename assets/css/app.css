@@ -1,0 +1,722 @@
+
+:root{--navy:#101827;--navy2:#1b2940;--gold:#d7b56d;--bg:#f3f5f8;--ink:#172033;--muted:#687386;--line:#dfe4ec;--green:#16794b;--red:#b42318}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:white;padding:24px 15px;border-bottom:4px solid var(--gold)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:0 0 14px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.topbar-user{min-width:0;color:var(--navy);font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-user span{display:block;color:#64748b;font-weight:400;margin-top:2px}
+.topbar .btn{flex:0 0 auto}
+@media(max-width:640px){.topbar{align-items:flex-start}.topbar-user{white-space:normal}.topbar .btn{padding:9px 12px}}
+.head,main{max-width:960px;margin:auto}
+.company{font-size:12px;letter-spacing:1.7px;color:var(--gold);font-weight:800}
+h1{font-size:24px;margin:5px 0 2px}
+header p{margin:0;color:#d9dfeb;font-size:13px}
+main{padding:18px 12px 40px}
+.notice{font-size:12px;color:#5d4a20;background:#fff6dc;border:1px solid #f0dfab;padding:10px 12px;border-radius:10px;margin-bottom:13px}
+.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:13px;box-shadow:0 2px 8px #15223808}
+.panel h2{font-size:17px;margin:0 0 13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.field{min-width:0}.full{grid-column:1/-1}
+label{display:block;font-size:12px;font-weight:750;color:#4c586b;margin-bottom:5px}
+input,select,textarea{font:inherit;width:100%;min-height:44px;border:1px solid #cfd6e1;border-radius:9px;padding:10px;background:white;color:var(--ink)}
+textarea{min-height:72px}
+.btn{border:0;border-radius:10px;padding:12px 14px;font:700 14px system-ui;cursor:pointer;min-height:44px}
+.primary{background:var(--navy);color:white}.gold{background:var(--gold);color:#201b10}.secondary{background:#edf1f6;color:var(--navy)}.danger{background:#fff0ef;color:var(--red)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions .btn{flex:1}
+.hint{font-size:12px;color:var(--muted)}
+.status{font-size:12px;padding:8px 10px;border-radius:8px;margin-bottom:10px;background:#edf1f6}
+.status.error{background:#fff0ef;color:var(--red)}.status.ok{background:#e8f5ee;color:var(--green)}
+.login-wrap{max-width:430px;margin:7vh auto 0}
+.login-card{padding:28px 24px}
+.login-title{text-align:center;margin-bottom:22px}
+.login-title .login-logo{display:block;width:auto;height:auto;max-width:min(260px,100%);max-height:86px;object-fit:contain;margin:0 auto 18px;border:0;border-radius:0;background:transparent}
+.login-title h2{font-size:22px;margin:0 0 4px}.login-title p{font-size:13px;color:var(--muted);margin:0}
+.login-footer{text-align:center;color:var(--muted);font-size:11px;margin-top:16px}
+.tabs{display:flex;gap:7px;margin-bottom:13px}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px}.admin-table th,.admin-table td{border:1px solid var(--line);padding:9px;text-align:left}.admin-table th{background:#eef2f7;color:var(--navy);font-size:12px}.admin-table select,.admin-table input{width:100%;padding:7px;border:1px solid var(--line);border-radius:7px}.role-badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef2f7;font-size:11px;font-weight:800}.role-badge.admin{background:#e8eef9}.role-badge.eval{background:#eee8fa}.role-badge.op{background:#e8f4ec}.user-actions{display:flex;gap:6px;flex-wrap:wrap}.incident-status{min-width:130px}
+.tab{flex:1;border:1px solid var(--line);background:white;border-radius:10px;padding:10px 5px;font-weight:700;color:var(--navy)}.tab.active{background:var(--navy);color:white}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.stat{background:white;border:1px solid var(--line);border-radius:11px;padding:11px}.stat span{display:block;font-size:11px;color:var(--muted)}.stat strong{font-size:19px}
+.entry{border:1px solid var(--line);border-radius:11px;padding:12px;margin-top:9px}.entry h3{font-size:15px;margin:0}.entry p{font-size:12px;color:var(--muted);margin:4px 0}
+.entrytop{display:flex;justify-content:space-between;gap:8px}.pill{font-size:11px;font-weight:800;background:#e8f5ee;color:var(--green);border-radius:20px;padding:4px 8px;height:max-content}.pending{background:#fff3d7;color:#8b5b00}
+.entrybuttons{display:flex;gap:7px;margin-top:9px}.entrybuttons button{flex:1}.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.empty{text-align:center;padding:22px;color:var(--muted);font-size:14px}[hidden]{display:none!important}
+@media(min-width:680px){main{padding:20px}.entrylist{display:grid;grid-template-columns:1fr 1fr;gap:9px}.entrylist .entry{margin-top:0}.panel{padding:20px}}
+@media(max-width:390px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.stats strong{font-size:16px}.tab{font-size:12px}}
+
+.evaluation-grid{display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:end}
+.score-box{font-weight:800;text-align:center}
+.total-card{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.total-score{font-size:32px;font-weight:900;color:var(--navy)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}
+.kpi{background:white;border:1px solid var(--line);border-radius:12px;padding:12px}
+.kpi span{display:block;font-size:11px;color:var(--muted)}
+.kpi strong{display:block;font-size:20px;margin-top:2px}
+.bonus-kpi{background:linear-gradient(135deg,#fff9e8 0%,#fff0c2 100%);border:2px solid #e7b94e;border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(122,87,14,.08)}
+.bonus-kpi span{display:block;font-size:12px;font-weight:800;color:#7a570e}
+.bonus-kpi strong{display:block;font-size:30px;line-height:1.1;margin-top:5px;color:#704b00;font-weight:900}
+.bonus-kpi small{display:block;margin-top:6px;color:#775d25;font-size:11px}
+@media(max-width:680px){.bonus-dashboard-grid{grid-template-columns:1fr!important}.bonus-kpi strong{font-size:26px}}
+.report-bonus{border:2px solid #e1b642;border-radius:10px;padding:10px;text-align:center;background:linear-gradient(135deg,#fff9e8,#ffefbd)}
+.report-bonus span{font-size:9px;text-transform:uppercase;color:#775714;font-weight:800;display:block}
+.report-bonus strong{display:block;font-size:34px;color:#704b00;font-weight:900;line-height:1.05;margin-top:5px}
+.report-bonus small{font-size:9px;color:#775d25;display:block;margin-top:4px}
+
+.result-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.component{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:9px;background:#fff}
+.component-head{display:flex;justify-content:space-between;gap:8px;font-weight:800}
+.bar{height:10px;background:#e9edf3;border-radius:999px;overflow:hidden;margin-top:8px}
+.bar>span{display:block;height:100%;background:var(--navy);border-radius:999px}
+.cone-wrap{display:grid;grid-template-columns:minmax(280px,1fr) minmax(280px,1fr);gap:22px;align-items:center;margin-top:8px}
+.cone-panel{background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);border:1px solid var(--line);border-radius:16px;padding:18px 14px 14px;box-shadow:0 5px 18px #1522380d}
+.cone-title{text-align:center;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.cone{min-height:300px;display:flex;align-items:center;justify-content:center;position:relative}
+.cone-shape{width:250px;height:255px;position:relative;filter:drop-shadow(0 7px 10px #15223818);clip-path:polygon(50% 0%,100% 100%,0% 100%);background:#e8edf3;overflow:hidden}
+.cone-fill{position:absolute;left:0;bottom:0;width:100%;height:0%;background:linear-gradient(180deg,#243b5a 0%,var(--navy) 100%);transition:height .7s ease;z-index:1}
+.cone-lines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0,transparent 24.5%,#ffffff80 24.5%,#ffffff80 25%);z-index:2}
+.cone-label{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:150px;text-align:center;color:var(--navy);background:#ffffffeb;border:1px solid #ffffff;padding:10px 8px;border-radius:999px;font-weight:900;font-size:30px;line-height:1;box-shadow:0 4px 10px #15223818}
+.cone-label small{display:block;font-size:11px;margin-top:7px;letter-spacing:.08em;text-transform:uppercase}
+.cone-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);padding:0 14px;margin-top:-2px}
+.legend{display:grid;gap:9px}
+.legend div{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:#fff}
+.legend strong{font-size:14px}
+.result-status{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;background:#fff3d7;color:#8b5b00;font-size:11px;font-weight:900}
+.result-status.complete{background:#e8f5ee;color:var(--green)}
+.result-summary{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0 9px;background:#fff}
+.result-summary strong{font-size:24px;color:var(--navy)}
+.result-subtitle{font-size:12px;color:var(--muted)}
+@media(max-width:680px){.cone-wrap{grid-template-columns:1fr}.cone-panel{padding:14px 8px}.cone{min-height:275px}.cone-shape{width:220px;height:235px}}
+.legend div{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:8px 0}
+.badge{display:inline-block;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:800;background:#edf1f6}
+.badge.ok{background:#e8f5ee;color:var(--green)}
+.badge.warn{background:#fff3d7;color:#8b5b00}
+@media(max-width:680px){.kpi-grid{grid-template-columns:1fr 1fr}.cone-wrap{grid-template-columns:1fr}.evaluation-grid{grid-template-columns:1fr 90px}.result-row{grid-template-columns:1fr}}
+@media(max-width:390px){.kpi-grid{grid-template-columns:1fr 1fr}.kpi strong{font-size:17px}}
+
+
+
+.report-preview-wrap{background:#eef2f6;padding:18px;border-radius:14px;margin-top:14px}
+.report-page{width:8.5in;min-height:11in;margin:0 auto;background:#fff;box-sizing:border-box;padding:.42in .46in .48in;color:#17294a;font-family:Arial,Helvetica,sans-serif;box-shadow:0 7px 24px #15223818}
+.report-header{display:grid;grid-template-columns:1.55fr 1.65fr 1fr;align-items:end;gap:14px;border-bottom:3px solid #17294a;padding:0 0 11px;background:#fff}
+.report-logo-box{display:flex;align-items:center;justify-content:flex-start;background:#fff;padding:0}
+.report-logo{width:100%;max-width:300px;max-height:88px;object-fit:contain;object-position:left center}
+.report-company{text-align:center;color:#17294a;align-self:end;padding-bottom:3px}
+.report-company h1{margin:0;font-size:20px;font-weight:900;letter-spacing:.02em}
+.report-company p{margin:5px 0 0;font-size:10px;color:#60708a}
+.report-doc{text-align:right;font-size:10px;color:#60708a;align-self:end;padding-bottom:2px}
+.report-doc strong{display:block;color:#17294a;font-size:12px;margin-bottom:3px}
+.report-title{text-align:center;margin:16px 0 9px}
+.report-title h2{margin:0;font-size:19px;color:#17294a;font-weight:900;letter-spacing:.045em}
+.report-title p{margin:5px 0 0;font-size:10px;color:#60708a}
+.report-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:11px 0}
+.report-meta div{border:1px solid #d7dfe9;border-radius:8px;padding:8px 10px;background:#fff}
+.report-meta span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#60708a}
+.report-meta strong{display:block;margin-top:3px;font-size:12px;color:#17294a}
+.report-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 14px}
+.report-kpi{border:1px solid #d7dfe9;border-radius:8px;padding:9px 7px;text-align:center;background:#fff}
+.report-kpi span{display:block;font-size:9px;color:#60708a;text-transform:uppercase}
+.report-kpi strong{display:block;margin-top:3px;font-size:19px;color:#17294a;font-weight:900}
+.report-kpi:nth-child(1) strong{color:#d71920}
+.report-kpi:nth-child(2) strong{color:#16843b}
+.report-kpi:nth-child(3) strong{color:#d71920}
+.report-kpi:nth-child(4) strong{color:#16843b}
+.report-section-title{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:#fff;background:linear-gradient(90deg,#1c314c 0%,#263c57 100%);border-left:7px solid #d71920;border-radius:5px;padding:7px 10px;margin:13px 0 7px}
+.report-table{width:100%;border-collapse:collapse;font-size:10px}
+.report-table th{background:#dfe5ed;color:#17294a;border:1px solid #cbd4df;padding:6px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.03em}
+.report-table td{border:1px solid #d7dfe9;padding:6px;color:#17294a}
+.report-table td.num{text-align:right;font-variant-numeric:tabular-nums}
+.report-table tbody tr:nth-child(even){background:#fbfcfd}
+.report-table td:last-child{font-weight:700}
+.report-total{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:10px;align-items:stretch;margin-top:12px}
+.report-score{border:2px solid #17294a;border-radius:10px;padding:10px;text-align:center;background:linear-gradient(135deg,#f4f8fd,#e8f1fb)}
+.report-score span{font-size:9px;text-transform:uppercase;color:#53657e;font-weight:700}
+.report-score strong{display:block;font-size:34px;color:#17294a;font-weight:900;line-height:1.05;margin-top:5px}
+.report-score small{font-size:9px;color:#60708a}
+.report-note{border:1px solid #d7dfe9;border-radius:10px;padding:10px;font-size:10px;line-height:1.4;color:#17294a;background:#fff}
+.report-signatures{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:24px}
+.report-sign{padding-top:22px;border-top:1px solid #6f7885;text-align:center;font-size:9px;color:#60708a}
+.report-footer{border-top:1px solid #d7dfe9;margin-top:14px;padding-top:6px;display:flex;justify-content:space-between;font-size:8px;color:#7a8492}
+.report-status{display:inline-block;padding:4px 9px;border-radius:999px;background:#fff0c9;color:#8b5b00;font-size:9px;font-weight:900}
+.report-status.complete{background:#e8f5ee;color:#176b42}
+@media(max-width:900px){.report-preview-wrap{padding:6px;overflow:auto}.report-page{box-shadow:none}}
+@media print{
+  @page{size:Letter portrait;margin:0}
+  body{background:#fff!important}
+  body>*{display:none!important}
+  body>main{display:block!important}
+  #app{display:block!important}
+  #app>.tabs,#app>.notice,#status,#auth{display:none!important}
+  #reportsView{display:block!important}
+  #reportsView>.report-controls{display:none!important}
+  #reportPreview{display:block!important}
+  .report-preview-wrap{padding:0!important;margin:0!important;background:#fff!important}
+  .report-page{width:8.5in!important;min-height:11in!important;margin:0!important;box-shadow:none!important;padding:.42in .46in .48in!important}
+}
+
+@media(max-width:900px){.report-preview-wrap{padding:6px;overflow:auto}.report-page{box-shadow:none}}
+@media print{
+  @page{size:Letter portrait;margin:0}
+  body{background:#fff!important}
+  body>*{display:none!important}
+  body>main{display:block!important}
+  #app{display:block!important}
+  #app>.tabs,#app>.notice,#status,#auth{display:none!important}
+  #reportsView{display:block!important}
+  #reportsView>.report-controls{display:none!important}
+  #reportPreview{display:block!important}
+  .report-preview-wrap{padding:0!important;margin:0!important;background:#fff!important}
+  .report-page{width:8.5in!important;min-height:11in!important;margin:0!important;box-shadow:none!important;padding:.48in .55in .52in!important}
+}
+
+.fuel-card{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:10px;background:#fff}
+.fuel-total{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px}
+.fuel-total strong{font-size:22px;color:var(--navy)}
+
+/* Ajuste móvil integral: evita que pestañas, botones y formularios desborden la pantalla */
+@media (max-width: 680px) {
+  html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+  header, main, #app, #loginView { min-width: 0; max-width: 100%; }
+  header { padding: 18px 12px; }
+  h1 { font-size: clamp(20px, 5vw, 24px); overflow-wrap: anywhere; }
+  main { padding: 12px 8px 28px; }
+  .panel { padding: 13px 11px; min-width: 0; }
+  .grid, .evaluation-grid, .result-row { min-width: 0; }
+  .field, .full, .panel, .entry, .entrytop, .component-head { min-width: 0; }
+  input, select, textarea { min-width: 0; max-width: 100%; }
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+    min-width: 0;
+  }
+  .tabs .tab {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 10px 6px;
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+  .actions { display: flex; flex-wrap: wrap; width: 100%; min-width: 0; }
+  .actions .btn, .actions button {
+    flex: 1 1 145px;
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .toolbar { grid-template-columns: minmax(0, 1fr); }
+  .entrybuttons { display: flex; flex-wrap: wrap; min-width: 0; }
+  .entrybuttons button {
+    flex: 1 1 125px;
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .topbar { flex-wrap: wrap; gap: 8px; }
+  .topbar-user { flex: 1 1 150px; }
+  .topbar .btn { flex: 0 1 auto; max-width: 100%; white-space: normal; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cone-wrap { grid-template-columns: minmax(0, 1fr); }
+  .admin-table-wrap, .table-wrap, .report-preview-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-table { min-width: 620px; }
+  button { max-width: 100%; }
+}
+@media (max-width: 390px) {
+  .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tabs .tab { font-size: 11px; padding: 9px 4px; }
+  .panel { padding: 11px 9px; }
+  .actions .btn, .actions button { flex-basis: 100%; }
+  .entrybuttons button { flex-basis: 100%; }
+  .topbar .btn { flex: 1 1 100%; }
+  .evaluation-grid { grid-template-columns: minmax(0, 1fr) 86px; }
+}
+
+
+/* Reporte legible en móvil: se adapta al ancho sin desplazamiento horizontal */
+@media screen and (max-width: 680px) {
+  .report-total{grid-template-columns:1fr;}
+  .report-score strong,.report-bonus strong{font-size:28px;}
+
+  #reportPreview, .report-preview-wrap { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
+  .report-preview-wrap { padding:6px!important; margin-top:10px!important; overflow-x:hidden!important; overflow-y:visible!important; }
+  .report-page { width:100%!important; max-width:100%!important; min-height:0!important; margin:0!important; padding:12px!important; box-sizing:border-box!important; overflow-wrap:anywhere; box-shadow:none!important; }
+  .report-header { grid-template-columns:minmax(0,1fr)!important; gap:8px!important; text-align:center; }
+  .report-logo { width:auto!important; max-width:min(240px,100%)!important; max-height:66px!important; object-position:center!important; }
+  .report-company { text-align:center!important; }
+  .report-company h1 { font-size:17px!important; }
+  .report-company p { font-size:9px!important; }
+  .report-doc { text-align:center!important; font-size:9px!important; }
+  .report-title { margin:12px 0 8px!important; }
+  .report-title h2 { font-size:15px!important; line-height:1.25; }
+  .report-meta { grid-template-columns:minmax(0,1fr)!important; gap:6px!important; }
+  .report-meta div { padding:7px 8px!important; }
+  .report-kpis { grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:6px!important; }
+  .report-kpi { min-width:0; padding:8px 4px!important; overflow-wrap:anywhere; }
+  .report-kpi strong { font-size:17px!important; }
+  .report-total { grid-template-columns:minmax(0,1fr)!important; gap:8px!important; }
+  .report-score strong { font-size:30px!important; }
+  .report-table { width:100%!important; table-layout:fixed!important; font-size:8px!important; }
+  .report-table th, .report-table td { padding:4px 3px!important; overflow-wrap:anywhere; word-break:break-word; }
+  .report-table th { font-size:7px!important; letter-spacing:0!important; }
+  .report-signatures { gap:12px!important; }
+  .report-footer { gap:8px!important; flex-wrap:wrap; }
+}
+
+/* Impresión/PDF: ocultar sesión y controles, respetar márgenes físicos y evitar recortes laterales */
+@page { size: Letter portrait; margin: 0.42in; }
+@media print {
+  html, body { width:auto!important; height:auto!important; margin:0!important; padding:0!important; background:#fff!important; overflow:visible!important; }
+  body > * { display:none!important; }
+  body > main { display:block!important; margin:0!important; padding:0!important; width:auto!important; }
+  #status, #auth, #app > .notice, #app > .topbar, #app > .tabs, #app > .panel:not(.report-controls), #app > .notice { display:none!important; }
+  #app { display:block!important; width:auto!important; max-width:none!important; margin:0!important; padding:0!important; }
+  #reportsView { display:block!important; width:auto!important; margin:0!important; padding:0!important; }
+  #reportsView > .report-controls { display:none!important; }
+  #reportPreview { display:block!important; width:auto!important; max-width:none!important; margin:0!important; padding:0!important; }
+  .report-preview-wrap { display:block!important; width:auto!important; max-width:none!important; margin:0!important; padding:0!important; overflow:visible!important; background:#fff!important; border-radius:0!important; }
+  .report-page { display:block!important; width:100%!important; max-width:none!important; min-height:0!important; margin:0!important; padding:0!important; box-sizing:border-box!important; box-shadow:none!important; overflow:visible!important; }
+  .report-header, .report-title, .report-meta, .report-kpis, .report-total, .report-section-title, .report-table, .report-note, .report-signatures, .report-footer { break-inside:avoid; page-break-inside:avoid; }
+  .report-table tr { break-inside:avoid; page-break-inside:avoid; }
+}
+
+
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px}.photo-preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:12px}.photo-preview-item{min-width:0}.photo-preview-item img{width:100%;height:110px;object-fit:cover;border-radius:9px;border:1px solid var(--line);display:block}.photo-preview-item small{display:block;overflow-wrap:anywhere;margin-top:4px;color:var(--muted)}.photo-grid img{width:100%;height:130px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}.photo-modal{position:fixed;inset:0;background:#101827cc;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}.photo-modal-card{background:white;border-radius:14px;padding:18px;width:min(900px,100%);max-height:90vh;overflow:auto}.photo-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+
+/* PANLOGISTICS dashboard refresh — desktop and mobile */
+:root{--navy:#073b2c;--navy2:#07543b;--gold:#d5a43a;--bg:#f2f5f7;--green:#078454;--line:#dce5e8;--ink:#102236}
+body{background:linear-gradient(135deg,#eef3f5,#f7f9fb);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+body>header{background:linear-gradient(110deg,rgba(5,35,49,.96),rgba(8,76,57,.91)),radial-gradient(ellipse at 80% 20%,#d8a94a55,transparent 42%);border-bottom:3px solid var(--gold);padding:18px 22px}
+body>header .head{max-width:1500px}.company{color:#f2bd4e;font-size:13px;letter-spacing:1.1px}body>header h1{font-size:29px;letter-spacing:-.5px}body>header p{font-size:13px}
+main{max-width:1600px;padding:18px 22px 36px}
+#app{display:grid;grid-template-columns:224px minmax(0,1fr);gap:0 18px;align-items:start}
+#app>.notice,#app>.topbar{grid-column:1/-1}
+#app>.notice{background:#fff8e7;border-color:#f1dfad}
+#app>.topbar{border:0;border-radius:14px;background:#fff;padding:12px 16px;margin-bottom:14px;box-shadow:0 4px 16px #1022360b}
+#app>.tabs{grid-column:1;grid-row:auto;position:sticky;top:12px;display:flex;flex-direction:column;align-items:stretch;gap:5px;padding:10px;background:rgba(3,48,36,.97);border-radius:16px;box-shadow:0 8px 24px #063d2d18;min-height:calc(100vh - 170px)}
+#app>.tabs .tab{flex:none;text-align:left;padding:12px 13px;min-height:44px;border:0;border-radius:9px;background:transparent;color:#e7f3ee;font-size:13px;font-weight:650;white-space:normal}
+#app>.tabs .tab:hover{background:#ffffff18}#app>.tabs .tab.active{background:linear-gradient(100deg,#f2cf6d,#c99b31);color:#163326;box-shadow:0 2px 8px #0002}
+#app>section[id$="View"]{grid-column:2;min-width:0}
+#app>#dashboardView{grid-row:auto}
+#app .panel{background:rgba(255,255,255,.97);border:1px solid #e4e9ed;border-radius:15px;box-shadow:0 5px 18px #142f4010;padding:18px}
+#app .panel h2{color:#102236}
+.btn.primary{background:linear-gradient(100deg,#06432f,#087a4c);color:white}.btn.primary:hover{filter:brightness(1.08)}.btn.gold{background:linear-gradient(100deg,#f2cf6d,#c99b31)}
+#app .entry{background:#fff;border-radius:13px;border-color:#e5eaee;box-shadow:0 2px 9px #10223608}
+#app .entrybuttons{flex-wrap:wrap}#app .entrybuttons .btn{min-width:130px}
+#dashboardView{padding:0}
+.dash-brand{display:flex;align-items:center;gap:14px;min-width:0}.dash-logo{height:54px;max-width:190px;object-fit:contain}.dash-brand img{height:48px;max-width:185px;object-fit:contain}.dash-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 14px}.dash-heading h2{margin:0;font-size:23px;letter-spacing:-.4px}.dash-heading p{margin:3px 0 0;color:#697889;font-size:12px}
+.dash-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.dash-kpi{background:rgba(255,255,255,.97);border:1px solid #e3e9ed;border-radius:14px;padding:15px;box-shadow:0 4px 14px #15223808;min-width:0}
+.dash-kpi .kpi-label{font-size:12px;color:#58697a;display:flex;align-items:center;gap:8px}.dash-kpi .kpi-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#e5f6f1;color:#078b6b;font-size:20px;flex-shrink:0}.dash-kpi:nth-child(2) .kpi-icon{background:#e3f6ec;color:#07935a}.dash-kpi:nth-child(3) .kpi-icon{background:#fff2d9;color:#d28b12}.dash-kpi:nth-child(4) .kpi-icon{background:#ffebea;color:#d83c32}.dash-kpi strong{display:block;font-size:27px;line-height:1.2;margin:9px 0 4px;color:#102236}.dash-kpi small{color:#718091;font-size:11px}
+.dash-middle{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:12px;margin-bottom:12px}.dash-panel{background:rgba(255,255,255,.97);border:1px solid #e3e9ed;border-radius:15px;padding:16px;min-width:0;box-shadow:0 4px 14px #15223808}.dash-panel h3{font-size:14px;margin:0 0 12px;color:#14243a}.dash-bars{height:180px;display:grid;grid-template-columns:repeat(7,1fr);gap:9px;align-items:end;padding:8px 0 0;border-bottom:1px solid #dce4ea}.dash-day{height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:6px;min-width:0}.dash-bar-track{height:135px;width:min(26px,100%);display:flex;align-items:end;background:#f1f4f6;border-radius:5px 5px 0 0;overflow:hidden}.dash-bar-fill{width:100%;background:linear-gradient(180deg,#25a96c,#08794b);border-radius:5px 5px 0 0;min-height:2px}.dash-day span{font-size:10px;color:#657487}.dash-legend{display:flex;gap:14px;font-size:11px;color:#607084;margin-top:10px}.dash-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#078b59;margin-right:5px}.dash-dot.gold{background:#e8b64a}
+.dash-table{width:100%;border-collapse:collapse;font-size:12px}.dash-table th{text-align:left;background:#f3f6f8;color:#516274;font-weight:700;padding:10px 8px}.dash-table td{border-bottom:1px solid #edf0f3;padding:10px 8px}.dash-state{display:inline-block;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:800;background:#e3f6ec;color:#08794b;white-space:nowrap}.dash-state.pending{background:#fff0d0;color:#a16a00}.dash-state.alert{background:#ffe8e7;color:#bd302a}
+.dash-bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.dash-mini{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.97);border:1px solid #e3e9ed;border-radius:14px;padding:14px}.dash-mini .kpi-icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#e5f6f1;font-size:20px}.dash-mini strong{font-size:22px;display:block}.dash-mini small{font-size:11px;color:#68798a}
+.dash-actions{display:flex;gap:8px;flex-wrap:wrap}.dash-actions .btn{min-height:40px}
+@media(max-width:1050px){#app{grid-template-columns:190px minmax(0,1fr);gap:0 12px}main{padding:14px}.dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-middle{grid-template-columns:1fr}.dash-bottom{grid-template-columns:1fr 1fr}.dash-bottom .dash-mini:last-child{grid-column:1/-1}}
+@media(max-width:700px){body>header{padding:14px 15px}body>header h1{font-size:23px}main{padding:10px 9px 28px}#app{display:flex;flex-direction:column;gap:0}#app>.notice,#app>.topbar,#app>.tabs,#app>section[id$="View"]{width:100%;grid-column:auto}#app>.topbar{order:0;align-items:center;margin-bottom:9px;padding:10px}#app>.notice{order:1}#app>.tabs{order:2;position:static;min-height:0;display:flex;flex-direction:row;overflow-x:auto;gap:5px;padding:7px;margin:0 0 12px;border-radius:12px;scrollbar-width:thin}#app>.tabs .tab{flex:0 0 auto;width:auto;white-space:nowrap;padding:10px 12px;font-size:12px}#app>section[id$="View"]{order:3}.dash-heading{align-items:flex-start;flex-direction:column}.dash-brand{align-items:flex-start}.dash-brand img{height:38px;max-width:140px}.dash-heading h2{font-size:21px}.dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.dash-kpi{padding:11px}.dash-kpi .kpi-icon{width:32px;height:32px;font-size:17px}.dash-kpi strong{font-size:23px}.dash-middle{grid-template-columns:1fr}.dash-bottom{grid-template-columns:1fr}.dash-bottom .dash-mini:last-child{grid-column:auto}.dash-panel{padding:12px;overflow:hidden}.dash-table{min-width:500px}.dash-table-wrap{overflow-x:auto}.panel{padding:13px!important}.tabs .tab{border-radius:8px}.entrybuttons .btn{min-width:0!important}.topbar .btn{font-size:12px}}
+@media(prefers-reduced-motion:no-preference){.dash-kpi,.dash-panel,.dash-mini{transition:transform .16s ease,box-shadow .16s ease}.dash-kpi:hover,.dash-panel:hover,.dash-mini:hover{box-shadow:0 8px 24px #10223612}}
+
+
+/* Final visual layer based on the approved PANLOGISTICS design */
+body:has(#auth:not([hidden])){background:#eaf0f3}
+body:has(#auth:not([hidden]))>header{display:none}
+body:has(#auth:not([hidden]))>main{position:relative;display:flex;align-items:center;justify-content:center;width:100%;max-width:none;min-height:100vh;margin:0;padding:28px;background-image:linear-gradient(90deg,rgba(4,28,42,.18),rgba(4,28,42,.04) 42%,rgba(4,28,42,.12)),url("../images/panlogistics-background.jpg");background-size:cover;background-position:center;background-repeat:no-repeat}
+body:has(#auth:not([hidden])) #status{position:fixed;top:12px;left:12px;right:12px;z-index:10000;max-width:720px;margin:auto}
+#auth.login-wrap{width:min(490px,100%);max-width:490px;margin:0;position:relative;z-index:2}
+#auth .login-card{padding:28px 34px 24px;border:1px solid rgba(255,255,255,.78);border-radius:20px;background:rgba(255,255,255,.96);box-shadow:0 24px 70px rgba(4,20,35,.28);backdrop-filter:blur(10px)}
+#auth .login-title{margin-bottom:22px}
+#auth .login-title .login-logo{max-height:82px;max-width:min(300px,100%);margin-bottom:10px}
+#auth .login-title h2{font-size:28px;letter-spacing:-.7px;color:#101d31}
+#auth .login-title p{font-size:14px;margin-top:5px}
+#auth label{font-size:13px}
+#auth input{min-height:48px;border-radius:10px;background:#fbfcfd}
+#auth .btn.primary{width:100%;background:linear-gradient(100deg,#003d2b,#00774a);font-size:16px;min-height:48px}
+#auth .login-footer{font-size:12px;margin-top:18px}
+.dash-heading{padding:15px 17px;border-radius:15px;background:linear-gradient(100deg,#fff 0%,#fff 40%,#edf5f1 68%,#e9f0f3 100%);border:1px solid #e1e9ec;box-shadow:0 4px 16px #1022360b}
+.dash-heading:before{content:"";position:absolute}
+.dash-brand img{max-width:210px}
+#operationalControl{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:12px;margin-bottom:12px}
+.operational-card{background:#fff;border:1px solid #e2e9ed;border-radius:15px;padding:16px;box-shadow:0 4px 16px #1022360a;min-width:0}
+.operational-card h3{margin:0 0 10px;font-size:15px;color:#102236}
+.operational-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.operational-actions .btn{min-height:64px;font-size:14px}
+#startOperationalBtn{background:linear-gradient(110deg,#006342,#008d5a);color:#fff}
+#finishOperationalBtn{background:linear-gradient(110deg,#f2c75d,#d9a32e);color:#172b23}
+.operational-hint{font-size:12px;color:#6a7a8b;margin:8px 0 0}
+.photo-pick-actions .btn{min-height:50px}
+@media(max-width:700px){body:has(#auth:not([hidden]))>main{padding:18px 12px;background-position:center}#auth .login-card{padding:24px 20px 20px}#auth .login-title h2{font-size:24px}#operationalControl{grid-template-columns:1fr}.operational-actions{grid-template-columns:1fr 1fr}.dash-heading{padding:12px}}
+@media(max-width:420px){.operational-actions{grid-template-columns:1fr}}
+/* Dashboard uses the same full-page background as the login screen; no duplicate hero banner. */
+
+.form-operational-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-operational-actions .btn{min-height:58px;font-size:15px;font-weight:800;box-shadow:0 3px 8px #10223618}
+.form-operational-actions #formStartBtn{background:linear-gradient(110deg,#005b3d,#008454);color:#fff;border:2px solid #005b3d;opacity:1}
+.form-operational-actions #formFinishBtn{background:linear-gradient(110deg,#f5cc62,#e2ac30);color:#173326;border:2px solid #c18a16;opacity:1}
+.form-operational-actions .btn:disabled{opacity:.42;filter:grayscale(.35);cursor:not-allowed}
+#app>.tabs{background:rgba(2,48,35,.98)!important;}
+#app>.tabs .tab{color:#fff!important}
+#app>.tabs .tab.active{color:#173326!important}
+@media(max-width:700px){.form-operational-actions{grid-template-columns:1fr 1fr}.form-operational-actions .btn{font-size:12px;padding:10px 6px}}
+
+.dash-hero-copy{max-width:720px;position:relative;z-index:1}.dash-hero .eyebrow{font-size:12px;font-weight:850;letter-spacing:1.4px;color:#f5c85c;margin-bottom:6px}.dash-hero h2{margin:0;font-size:clamp(24px,3vw,34px);line-height:1.12;letter-spacing:-.5px;color:#fff}.dash-hero p{margin:7px 0 0;color:#f3f6f7;font-size:13px}.dash-hero .hero-rule{height:3px;width:130px;border-radius:3px;background:#e3b446;margin-top:14px}
+#operationalControl{grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr)}
+#operationalControl .operational-card{padding:15px}
+#operationalControl .operational-actions .btn{font-weight:800;white-space:normal}
+.admin-operational-note{margin:0 0 12px;padding:13px 16px;border:1px solid #f1dba0;border-radius:12px;background:#fff8e7;color:#70531a;font-size:13px}
+@media(max-width:700px){.dash-hero{min-height:145px;padding:17px;background-position:center}.dash-hero h2{font-size:24px}#operationalControl{grid-template-columns:1fr}}
+
+
+/* Ajuste solicitado: misma fotografía panorámica de puerto como fondo completo, tanto en acceso como dentro de la app. */
+html,body{min-height:100%;}
+body{background-color:#0b2530!important;background-image:linear-gradient(110deg,rgba(3,22,34,.40),rgba(3,22,34,.12) 55%,rgba(3,22,34,.28)),url("../images/panlogistics-background.jpg")!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;background-attachment:fixed!important;}
+body>header{display:none!important;}
+body>main{width:100%!important;max-width:none!important;min-height:100vh!important;margin:0!important;background:transparent!important;}
+body:has(#auth:not([hidden]))>main{display:flex!important;align-items:center!important;justify-content:center!important;padding:28px!important;background:transparent!important;}
+body:has(#auth[hidden])>main{padding:18px!important;background:transparent!important;}
+#app{width:100%!important;max-width:none!important;}
+.dash-hero{display:none!important;}
+.dash-heading,.panel,.dash-kpi,.dash-panel,.dash-mini,.operational-card,.topbar,.tabs,.notice{background:rgba(255,255,255,.94)!important;backdrop-filter:blur(7px);}
+.operational-time-note{padding:12px 14px;border:1px solid #d6e7df;border-radius:10px;background:rgba(236,248,242,.96);}
+.operational-time-note p{margin:5px 0 0;}
+#operationalControl{scroll-margin-top:15px;}
+#startOperationalBtn{background:linear-gradient(110deg,#00452f,#078653)!important;color:#fff!important;min-height:54px;}
+#finishOperationalBtn{background:linear-gradient(110deg,#f4c75b,#e3a928)!important;color:#172033!important;min-height:54px;}
+@media(max-width:700px){body{background-attachment:scroll!important;}body:has(#auth[hidden])>main{padding:9px!important;}body:has(#auth:not([hidden]))>main{padding:16px!important;}.operational-time-note{grid-column:1/-1;}}
+
+
+/* Ajuste final de cabecera y controles: título de texto dentro de la sesión, fondo único y controles verdes. */
+.app-brand-header{display:block;margin:0 0 14px;padding:22px 26px 20px;border-radius:15px;border:1px solid rgba(255,255,255,.22);background:linear-gradient(100deg,rgba(2,35,39,.90),rgba(0,77,54,.84));box-shadow:0 8px 24px rgba(0,0,0,.16);color:#fff}
+.app-brand-header .app-brand-eyebrow{font-size:12px;font-weight:900;letter-spacing:1.6px;color:#f5c85c;margin-bottom:7px}
+.app-brand-header h1{margin:0;font-size:clamp(26px,3vw,38px);line-height:1.12;color:#fff}
+.app-brand-header p{margin:7px 0 0;font-size:14px;color:#f1f6f5}
+.app-brand-rule{display:block;width:135px;height:3px;background:#e2b33d;border-radius:4px;margin-top:13px}
+/* El fondo fotográfico se mantiene como fondo de página; no se añade una segunda imagen/cabecera. */
+.dash-hero{display:none!important}
+#app>.tabs{background:rgba(0,61,43,.98)!important;border:1px solid rgba(255,255,255,.15)!important;box-shadow:0 6px 20px rgba(0,0,0,.14)!important}
+#app>.tabs .tab{color:#f5fbf8!important;font-weight:750}
+#app>.tabs .tab.active{background:linear-gradient(110deg,#f5d36e,#d6a42e)!important;color:#12372b!important}
+.form-operational-box{background:linear-gradient(135deg,rgba(0,67,47,.98),rgba(0,99,65,.96))!important;border:1px solid #1b8a62!important;box-shadow:0 8px 22px rgba(0,0,0,.15)!important;color:#fff!important}
+.form-operational-box h3,.form-operational-box strong,.form-operational-box label{color:#fff!important}
+.form-operational-box .hint,.form-operational-box p{color:#e3f2eb!important}
+.form-operational-actions #formStartBtn{background:linear-gradient(110deg,#f5d36e,#d6a42e)!important;color:#15382b!important;border:2px solid #f5d36e!important}
+.form-operational-actions #formFinishBtn{background:linear-gradient(110deg,#008553,#00a36a)!important;color:#fff!important;border:2px solid #36b982!important}
+.form-operational-actions .btn:disabled{opacity:.52!important;filter:none!important}
+#operationalControl .operational-card{background:linear-gradient(135deg,rgba(0,67,47,.98),rgba(0,99,65,.96))!important;color:#fff!important;border-color:#1b8a62!important}
+#operationalControl .operational-card h3,#operationalControl .operational-card label{color:#fff!important}
+#operationalControl .operational-hint{color:#e3f2eb!important}
+#operationalControl #startOperationalBtn{background:linear-gradient(110deg,#f5d36e,#d6a42e)!important;color:#15382b!important}
+#operationalControl #finishOperationalBtn{background:linear-gradient(110deg,#008553,#00a36a)!important;color:#fff!important}
+@media(max-width:700px){.app-brand-header{padding:17px 16px}.app-brand-header h1{font-size:25px}.app-brand-header p{font-size:12px}}
+
+/* Corrección solicitada: la cabecera posterior al login ocupa todo el ancho y la sesión usa verde corporativo. */
+#app>.app-brand-header{grid-column:1/-1!important;grid-row:auto!important;width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important;display:block!important;overflow:visible!important}
+#app>.app-brand-header h1{max-width:none!important;width:100%!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;font-size:clamp(30px,3vw,42px)!important;line-height:1.12!important}
+#app>.app-brand-header p{max-width:none!important;width:100%!important;white-space:normal!important;overflow-wrap:normal!important}
+#app>.topbar{background:linear-gradient(110deg,#00452f,#087a4c)!important;color:#fff!important;border:1px solid #17865d!important;box-shadow:0 5px 18px rgba(0,0,0,.16)!important}
+#app>.topbar #sessionUser{color:#fff!important;font-weight:800!important}
+#app>.topbar #sessionUser span{display:block;color:#d8f0e5!important;font-weight:500!important;margin-top:3px}
+#app>.topbar #logoutTop{background:#f0c95f!important;color:#15382b!important;border:1px solid #f0c95f!important;font-weight:800!important}
+#app>.topbar #logoutTop:hover{filter:brightness(1.04)}
+@media(max-width:700px){#app>.app-brand-header{padding:17px 16px!important}#app>.app-brand-header h1{font-size:clamp(25px,6vw,34px)!important;line-height:1.12!important}#app>.app-brand-header p{font-size:13px!important}}
+
+
+/* PANLOGISTICS — impresión limpia del reporte quincenal */
+@media print {
+  @page { size: Letter portrait; margin: 0.42in; }
+
+  html, body {
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  /* Oculta el encabezado general de la aplicación y deja solo el reporte. */
+  body > header,
+  body > footer,
+  body > main > :not(#app) {
+    display: none !important;
+  }
+  body > main {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #app {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #app > :not(#reportsView) { display: none !important; }
+
+  #reportsView {
+    display: block !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #reportsView > .report-controls { display: none !important; }
+  #reportPreview { display: block !important; }
+  .report-preview-wrap {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    border-radius: 0 !important;
+  }
+  .report-page {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  /* Evita títulos huérfanos y permite que las tablas largas fluyan entre páginas. */
+  .report-header,
+  .report-title,
+  .report-meta,
+  .report-kpis,
+  .report-total,
+  .report-note,
+  .report-signatures,
+  .report-footer {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .report-section-title {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .report-table {
+    width: 100% !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+  .report-table thead { display: table-header-group; }
+  .report-table tfoot { display: table-footer-group; }
+  .report-table tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .report-signatures { margin-top: 16px !important; }
+}
+
+/* Vista previa: tres indicadores distribuidos sin una columna vacía. */
+.report-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+
+/* Ajuste final de paginación del reporte quincenal */
+@page { size: Letter portrait; margin: 0.34in 0.42in 0.34in 0.42in; }
+@media print {
+  html, body { margin:0!important; padding:0!important; }
+  .report-page {
+    width:100%!important;
+    min-height:0!important;
+    height:auto!important;
+    padding:0!important;
+    margin:0!important;
+    overflow:visible!important;
+  }
+  .report-section-title {
+    break-after:avoid-page!important;
+    page-break-after:avoid!important;
+    margin-top:10px!important;
+    margin-bottom:5px!important;
+  }
+  .report-section-title + .report-table {
+    break-before:avoid-page!important;
+    page-break-before:avoid!important;
+  }
+  .report-table {
+    break-inside:auto!important;
+    page-break-inside:auto!important;
+  }
+  .report-table thead { display:table-header-group!important; }
+  .report-table tr {
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+  }
+  .report-total { margin-top:8px!important; gap:8px!important; }
+  .report-signatures {
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+    margin-top:10px!important;
+    gap:32px!important;
+  }
+  .report-sign { padding-top:14px!important; }
+  .report-signatures + .report-footer {
+    break-before:avoid-page!important;
+    page-break-before:avoid!important;
+    margin-top:8px!important;
+    padding-top:5px!important;
+  }
+  .report-footer {
+    break-inside:auto!important;
+    page-break-inside:auto!important;
+    margin-bottom:0!important;
+  }
+}
+
+/* PANLOGISTICS: flujo visible e interactivo del control semanal Hino */
+.truck-workflow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.truck-step{border:1px solid #dce5e8;border-radius:13px;background:#fff;padding:13px;min-width:0;box-shadow:0 3px 12px #1022360b}
+.truck-step strong{display:block;color:#073b2c;font-size:13px;margin-bottom:4px}
+.truck-step p{margin:0 0 10px;color:#687386;font-size:11px;line-height:1.35}
+.truck-step .btn{width:100%;padding:10px;font-size:12px}
+.truck-progress{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border:1px solid #dce5e8;border-radius:10px;background:#f7faf9;padding:10px 12px;margin:10px 0 6px}
+.truck-progress strong{color:#073b2c;font-size:13px}
+.truck-progress span{font-size:12px;color:#687386}
+.truck-camera-slot{width:100%;min-width:0;min-height:158px;border:2px dashed #8da99b;background:linear-gradient(180deg,#fff,#f4faf6);transition:border-color .15s,background .15s,transform .15s}
+.truck-camera-slot:hover{border-color:#087a4c;background:#effaf4;transform:translateY(-1px)}
+.truck-camera-slot .camera-icon{font-size:34px}
+.truck-camera-slot strong{font-size:12px;color:#173b2d}
+.truck-camera-slot .camera-placeholder span:last-child{font-weight:800;color:#087a4c}
+.truck-camera-item{min-width:0}
+#reportPreview{scroll-margin-top:18px}
+.report-preview-wrap{margin-top:8px}
+@media(max-width:760px){.truck-workflow{grid-template-columns:1fr}.truck-step{padding:12px}.truck-camera-slot{min-height:142px}}
+.truck-section{border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0;background:#fbfcfe}.truck-section h3{margin:0 0 10px;color:var(--navy)}.truck-photo-note{font-size:12px;color:#7a570e;background:#fff6dc;border:1px solid #f0dfab;border-radius:9px;padding:9px;margin:8px 0}.truck-record{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0;background:white}.truck-record-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.truck-photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:8px}.truck-photo-grid img{width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}@media(max-width:600px){.truck-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}.truck-camera-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}.truck-camera-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;padding:10px;border:2px dashed #b7c7d8;border-radius:12px;background:#fff;color:#17334b;font-weight:800;cursor:pointer;text-align:center}.truck-camera-slot:focus-visible{outline:3px solid #e7b94e;outline-offset:2px}.truck-camera-slot .camera-placeholder{display:flex;flex-direction:column;align-items:center;gap:7px;color:#587087;font-size:12px}.truck-camera-slot .camera-icon{font-size:30px}.truck-camera-slot img{width:100%;height:112px;object-fit:cover;border-radius:8px}.truck-camera-slot .camera-retake{font-size:11px;color:#08784f}@media(max-width:760px){.truck-camera-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.truck-camera-slot{min-height:140px}}.truck-camera-modal{position:fixed;inset:0;z-index:99999;background:#081522e8;display:flex;align-items:center;justify-content:center;padding:16px}.truck-camera-dialog{width:min(760px,100%);max-height:95dvh;overflow:auto;background:#fff;border-radius:18px;padding:16px;box-shadow:0 20px 70px #0008}.truck-camera-dialog h2{margin:0 0 5px;color:#17294a}.truck-camera-dialog p{margin:0 0 12px;color:#60708a;font-size:13px}.truck-camera-stage{position:relative;background:#101827;border-radius:12px;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:center}.truck-camera-stage video,.truck-camera-stage img{display:block;width:100%;max-height:62dvh;object-fit:contain}.truck-camera-error{padding:22px;color:#b42318;background:#fff0ef;border-radius:10px;margin:10px 0}.truck-camera-dialog .actions{margin-top:12px}.truck-camera-dialog .btn{min-height:48px}.truck-camera-dialog .camera-tip{font-size:12px;color:#66758a;margin-top:10px}@media(max-width:600px){.truck-camera-modal{padding:7px}.truck-camera-dialog{padding:12px;border-radius:14px}.truck-camera-stage{min-height:190px}}
+/* PANLOGISTICS FIX 12-NOV-2026: garantizar que el módulo Reportes PDF sea visible en pantalla. */
+@media screen {
+  #app>#reportsView:not([hidden]) { display:block!important; visibility:visible!important; opacity:1!important; grid-column:2!important; min-width:0!important; width:100%!important; }
+  #reportsView:not([hidden])>.report-controls { display:block!important; visibility:visible!important; opacity:1!important; position:relative!important; width:100%!important; min-height:0!important; }
+  #reportsView:not([hidden])>#reportPreview { display:block!important; visibility:visible!important; width:100%!important; min-height:70px!important; }
+  #reportsView:not([hidden]) .report-controls .grid,
+  #reportsView:not([hidden]) .report-controls .actions { display:grid!important; visibility:visible!important; }
+  #reportsView:not([hidden]) .report-controls .actions { display:flex!important; }
+}
+
+
+
+/* PANLOGISTICS - DISTRIBUCION DEFINITIVA DEL DASHBOARD */
+@media screen and (min-width: 701px) {
+
+  #app {
+    display: grid !important;
+    grid-template-columns: 224px minmax(0, 1fr) !important;
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+    align-items: start !important;
+    column-gap: 18px !important;
+    row-gap: 0 !important;
+  }
+
+  /* FILA 1: ENCABEZADO PRINCIPAL */
+  #app > .app-brand-header {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+  }
+
+  /* FILA 2: BARRA DE SESION */
+  #app > .topbar {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    margin-bottom: 14px !important;
+  }
+
+  /* FILA 3, COLUMNA 1: MENU LATERAL */
+  #app > .tabs {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    align-self: start !important;
+    position: sticky !important;
+    top: 12px !important;
+    width: 100% !important;
+  }
+
+  /* FILA 3, COLUMNA 2: CONTENIDO */
+  #app > section[id$="View"]:not([hidden]) {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+    align-self: start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* REPORTES PDF */
+  #app > #reportsView:not([hidden]) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  #reportsView > .report-controls,
+  #reportsView > #reportPreview {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+
+/* PANLOGISTICS FIX: menú lateral e informe activo comparten siempre la fila 3 en escritorio. */
+@media screen and (min-width: 701px) {
+  #app > .tabs {
+    grid-row: 3 !important;
+  }
+
+  #app > section[id$="View"]:not([hidden]) {
+    grid-row: 3 !important;
+  }
+}
+
+
+/* PANLOGISTICS 13-NOV-2026: fijar el contenido activo en la misma fila del menu. */
+@media screen and (min-width: 701px) {
+  #app {
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+    grid-auto-rows: auto !important;
+  }
+  #app > .tabs {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+  }
+  #app > #reportsView:not([hidden]) {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+    align-self: start !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+}
+
+
+/* Control del camión: ilustraciones de referencia en cada botón de captura */
+.truck-camera-slot{gap:7px;padding:10px 12px;min-height:180px;overflow:hidden;background:linear-gradient(180deg,#fff 0%,#f5f8fb 100%)}
+.truck-reference-art{display:flex;align-items:center;justify-content:center;width:100%;height:112px;min-height:112px}
+.truck-reference-art svg{display:block;width:100%;height:100%;max-width:300px;filter:drop-shadow(0 3px 3px rgba(25,45,65,.12))}
+.truck-photo-action{display:block;color:#087a4c;font-size:12px;font-weight:850}
+.truck-camera-slot strong{font-size:12px;color:#173b2d}
+.truck-camera-slot:active{transform:scale(.985);border-color:#087a4c;background:#effaf4}
+.truck-camera-slot img{width:100%;height:112px;object-fit:cover;border-radius:8px}
+@media(max-width:760px){.truck-camera-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.truck-camera-slot{min-height:160px;padding:8px}.truck-reference-art{height:96px;min-height:96px}.truck-camera-slot img{height:96px}}

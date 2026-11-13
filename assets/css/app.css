@@ -688,3 +688,24 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
     grid-row: 3 !important;
   }
 }
+
+
+/* PANLOGISTICS 13-NOV-2026: fijar el contenido activo en la misma fila del menu. */
+@media screen and (min-width: 701px) {
+  #app {
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+    grid-auto-rows: auto !important;
+  }
+  #app > .tabs {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+  }
+  #app > #reportsView:not([hidden]) {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+    align-self: start !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+}

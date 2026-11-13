@@ -676,3 +676,15 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
     min-width: 0 !important;
   }
 }
+
+
+/* PANLOGISTICS FIX: menú lateral e informe activo comparten siempre la fila 3 en escritorio. */
+@media screen and (min-width: 701px) {
+  #app > .tabs {
+    grid-row: 3 !important;
+  }
+
+  #app > section[id$="View"]:not([hidden]) {
+    grid-row: 3 !important;
+  }
+}

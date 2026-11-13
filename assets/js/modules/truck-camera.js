@@ -5,15 +5,26 @@ function truckUpdatePhotoProgress(stage){
   const target=$(stage==='retiro'?'truckWithdrawalPhotoProgress':'truckReturnPhotoProgress');
   if(target)target.textContent=total+' de 4 capturadas'+(total===4?' · Completo':'');
 }
+function truckReferenceIllustration(angle){
+  const cab='<path d="M300 105h65l43 45v92H300z" fill="#f8fafc" stroke="#526477" stroke-width="5"/><path d="M318 119h42l32 35h-74z" fill="#b9d4df" stroke="#526477" stroke-width="4"/><path d="M410 166h15v35h-15z" fill="#e7b94e" stroke="#526477" stroke-width="3"/><circle cx="332" cy="247" r="25" fill="#263445"/><circle cx="332" cy="247" r="11" fill="#aab6c2"/><circle cx="386" cy="247" r="25" fill="#263445"/><circle cx="386" cy="247" r="11" fill="#aab6c2"/>';
+  const box='<rect x="55" y="82" width="245" height="145" rx="5" fill="#f8fafc" stroke="#526477" stroke-width="5"/><path d="M55 100h245" stroke="#d5dee7" stroke-width="3"/>';
+  const side=angle==='lateral_derecho'
+    ? '<g transform="translate(470 0) scale(-1 1)">'+box+cab+'</g>'
+    : box+cab;
+  const front='<path d="M170 80h130l45 48v104H125V128z" fill="#f8fafc" stroke="#526477" stroke-width="5"/><path d="M157 126h156l-15-33H174z" fill="#b9d4df" stroke="#526477" stroke-width="4"/><rect x="175" y="164" width="120" height="27" rx="5" fill="#34465a"/><rect x="135" y="165" width="23" height="18" rx="4" fill="#f3d36b"/><rect x="312" y="165" width="23" height="18" rx="4" fill="#f3d36b"/><circle cx="165" cy="237" r="23" fill="#263445"/><circle cx="305" cy="237" r="23" fill="#263445"/>';
+  const rear='<rect x="145" y="78" width="190" height="158" rx="5" fill="#f8fafc" stroke="#526477" stroke-width="5"/><path d="M240 80v154" stroke="#526477" stroke-width="4"/><path d="M160 95h160M160 218h160" stroke="#d5dee7" stroke-width="3"/><rect x="155" y="197" width="25" height="20" rx="3" fill="#d94b4b"/><rect x="310" y="197" width="25" height="20" rx="3" fill="#d94b4b"/><circle cx="180" cy="242" r="20" fill="#263445"/><circle cx="300" cy="242" r="20" fill="#263445"/>';
+  const drawing=angle==='frontal'?front:angle==='trasera'?rear:side;
+  return '<svg viewBox="0 0 470 290" role="img" aria-label="Vista de referencia del camión Hino" xmlns="http://www.w3.org/2000/svg"><ellipse cx="235" cy="266" rx="190" ry="12" fill="#dce4eb"/>'+drawing+'</svg>';
+}
 function truckBuildPhotoSlots(stage){
   const host=$(stage==='retiro'?'truckWithdrawalPhotos':'truckReturnPhotos');if(!host)return;
-  host.innerHTML=TRUCK_ANGLES.map(a=>'<div class="truck-camera-item"><button class="truck-camera-slot" type="button" data-truck-camera="'+stage+'" data-angle="'+a.id+'" aria-label="Abrir cámara: '+a.label+'"><span class="camera-placeholder"><span class="camera-icon">📷</span><span>Toca para tomar foto</span></span><strong>'+a.label+'</strong></button></div>').join('');
+  host.innerHTML=TRUCK_ANGLES.map(a=>'<div class="truck-camera-item"><button class="truck-camera-slot" type="button" data-truck-camera="'+stage+'" data-angle="'+a.id+'" aria-label="Abrir cámara: '+a.label+'"><span class="truck-reference-art">'+truckReferenceIllustration(a.id)+'</span><span class="truck-photo-action">📷 Toca para tomar foto</span><strong>'+a.label+'</strong></button></div>').join('');
   truckUpdatePhotoProgress(stage);
 }
 function truckRenderPhotoSlot(stage,angle){
   const selection=truckPhotoSelections[stage][angle],button=document.querySelector('[data-truck-camera="'+stage+'"][data-angle="'+angle+'"]');if(!button)return;
   const label=TRUCK_ANGLES.find(a=>a.id===angle)?.label||angle;
-  button.innerHTML=selection?.previewUrl?'<img src="'+selection.previewUrl+'" alt="'+label+'"><strong>'+label+'</strong><span class="camera-retake">✓ Foto capturada · toca para repetir</span>':'<span class="camera-placeholder"><span class="camera-icon">📷</span><span>Toca para tomar foto</span></span><strong>'+label+'</strong>';
+  button.innerHTML=selection?.previewUrl?'<img src="'+selection.previewUrl+'" alt="'+label+'"><strong>'+label+'</strong><span class="camera-retake">✓ Foto capturada · toca para repetir</span>':'<span class="truck-reference-art">'+truckReferenceIllustration(angle)+'</span><span class="truck-photo-action">📷 Toca para tomar foto</span><strong>'+label+'</strong>';
   truckUpdatePhotoProgress(stage);
 }
 function truckClearPhotoSelections(stage){

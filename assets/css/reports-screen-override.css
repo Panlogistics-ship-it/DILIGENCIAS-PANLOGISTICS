@@ -40,3 +40,28 @@
     visibility: visible !important;
   }
 }
+
+/* Fix 2026-11-13: el reporte debe compartir la fila de la barra lateral.
+   Antes quedaba en una fila automática posterior y aparecía cientos de píxeles abajo. */
+@media screen and (min-width: 701px) {
+  body main #app > #reportsView:not([hidden]) {
+    grid-row: 2 !important;
+    grid-column: 2 !important;
+    align-self: start !important;
+    margin-top: 0 !important;
+  }
+  body main #app > .tabs {
+    grid-row: 2 !important;
+    align-self: start !important;
+  }
+  body main #app {
+    align-content: start !important;
+    grid-auto-rows: max-content !important;
+  }
+}
+@media screen and (max-width: 700px) {
+  body main #app > #reportsView:not([hidden]) {
+    order: 3 !important;
+    margin-top: 0 !important;
+  }
+}

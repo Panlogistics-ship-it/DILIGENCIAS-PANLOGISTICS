@@ -628,6 +628,38 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 
 
 <link rel="stylesheet" href="assets/css/ui-notices.css">
+
+<style id="panlogistics-report-screen-layout">
+/* Pantalla: controles del reporte siempre arriba; vista previa debajo. */
+@media screen {
+  #reportsView:not([hidden]) {
+    display:block!important; width:100%!important; min-width:0!important;
+    margin:0!important; padding:0!important; visibility:visible!important;
+  }
+  #reportsView:not([hidden]) > .report-controls {
+    display:block!important; position:relative!important; width:100%!important;
+    min-width:0!important; height:auto!important; min-height:0!important;
+    margin:0 0 14px!important; padding:16px!important;
+    visibility:visible!important; opacity:1!important;
+  }
+  #reportsView:not([hidden]) > .report-controls h2 { margin-top:0!important; }
+  #reportsView:not([hidden]) > .report-controls .grid {
+    display:grid!important;
+    grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr))!important;
+    gap:12px!important; visibility:visible!important;
+  }
+  #reportsView:not([hidden]) > .report-controls .actions {
+    display:flex!important; flex-wrap:wrap!important; gap:10px!important;
+    visibility:visible!important;
+  }
+  #reportsView:not([hidden]) > #reportPreview {
+    display:block!important; position:relative!important; width:100%!important;
+    min-width:0!important; margin:0!important; padding:0!important;
+    visibility:visible!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <header>

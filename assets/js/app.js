@@ -1,6 +1,6 @@
 
-const SUPABASE_URL='https://stujfwqzbtbqfapmvpog.supabase.co';
-const SUPABASE_KEY='sb_publishable_RtUb5ukwLAWBKIwuGi09RQ_4lj3zscv';
+const SUPABASE_URL='https://ekqgkroulelmrwldgwjt.supabase.co';
+const SUPABASE_KEY='sb_publishable_hogn0O3Pu9RGjSacDrxqIg_S2TJpvrm';
 
 const $=id=>document.getElementById(id);
 let sb=null,user=null,editing=null,activeFormDiligenceId=null,records=[],profiles=[],currentProfile=null,vehicles=[],fuelRecords=[];

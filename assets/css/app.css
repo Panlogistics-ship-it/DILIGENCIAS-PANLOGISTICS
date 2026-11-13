@@ -709,3 +709,14 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
     width: 100% !important;
   }
 }
+
+
+/* Control del camión: ilustraciones de referencia en cada botón de captura */
+.truck-camera-slot{gap:7px;padding:10px 12px;min-height:180px;overflow:hidden;background:linear-gradient(180deg,#fff 0%,#f5f8fb 100%)}
+.truck-reference-art{display:flex;align-items:center;justify-content:center;width:100%;height:112px;min-height:112px}
+.truck-reference-art svg{display:block;width:100%;height:100%;max-width:300px;filter:drop-shadow(0 3px 3px rgba(25,45,65,.12))}
+.truck-photo-action{display:block;color:#087a4c;font-size:12px;font-weight:850}
+.truck-camera-slot strong{font-size:12px;color:#173b2d}
+.truck-camera-slot:active{transform:scale(.985);border-color:#087a4c;background:#effaf4}
+.truck-camera-slot img{width:100%;height:112px;object-fit:cover;border-radius:8px}
+@media(max-width:760px){.truck-camera-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.truck-camera-slot{min-height:160px;padding:8px}.truck-reference-art{height:96px;min-height:96px}.truck-camera-slot img{height:96px}}

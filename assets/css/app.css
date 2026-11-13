@@ -611,3 +611,64 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
   #reportsView:not([hidden]) .report-controls .actions { display:grid!important; visibility:visible!important; }
   #reportsView:not([hidden]) .report-controls .actions { display:flex!important; }
 }
+
+/* PANLOGISTICS - FIX DEFINITIVO DE DISTRIBUCION DEL DASHBOARD */
+@media screen and (min-width: 701px) {
+
+  #app {
+    display: grid !important;
+    grid-template-columns: 224px minmax(0, 1fr) !important;
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+    align-items: start !important;
+    column-gap: 18px !important;
+    row-gap: 0 !important;
+  }
+
+  /* Primera fila: encabezado */
+  #app > .app-brand-header {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Segunda fila: sesión */
+  #app > .topbar {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    margin-bottom: 14px !important;
+  }
+
+  /* Tercera fila, columna izquierda: menú */
+  #app > .tabs {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    align-self: start !important;
+    position: sticky !important;
+    top: 12px !important;
+    width: 100% !important;
+  }
+
+  /* Tercera fila, columna derecha: pantalla activa */
+  #app > section[id$="View"]:not([hidden]) {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+    align-self: start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  #app > #reportsView:not([hidden]) {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  #reportsView > .report-controls,
+  #reportsView > #reportPreview {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+}

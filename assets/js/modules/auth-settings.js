@@ -1,5 +1,5 @@
 async function loadSettings(){
-  if(!isAdmin()) return msg('No se pudo cargar la configuración: '+error.message,'error');
+  if(!isAdmin()) return;
   const {data,error}=await sb.from('app_settings').select('key,value').in('key',[
     'meta_diligencias_diarias',
     'horas_objetivo_por_diligencia',

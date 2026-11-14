@@ -1,5 +1,5 @@
 async function loadSettings(){
-  if(!isAdmin()) return;
+  if(!isAdmin()) return msg('No se pudo cargar la configuración: '+error.message,'error');
   const {data,error}=await sb.from('app_settings').select('key,value').in('key',[
     'meta_diligencias_diarias',
     'horas_objetivo_por_diligencia',
@@ -70,7 +70,10 @@ async function showApp(){
   if($('sessionUser')){
     const role=(currentProfile?.role||'').toUpperCase();
     const name=currentProfile?.full_name||user?.email||'Usuario';
-    $('sessionUser').innerHTML=`${esc(name)}<span>${esc(role||'USUARIO')} · Sesión activa</span>`;
+    const roleLabel=role==='ADMIN'
+      ? 'ADMIN · Supervisor · Director de Desarrollo · Sesión activa'
+      : `${esc(role||'USUARIO')} · Sesión activa`;
+    $('sessionUser').innerHTML=`${esc(name)}<span>${roleLabel}</span>`;
   }
   $('auth').hidden=true;$('app').hidden=false;if($('dashboardLogo')&&$('loginLogo'))$('dashboardLogo').src=$('loginLogo').src;msg('Sesión iniciada correctamente.','ok');resetForm();await loadProfiles();fillCollaboratorSelects();await loadEvaluators();applyRolePermissions();if($('gpsOperatorCard'))$('gpsOperatorCard').hidden=!isOperator();gpsSetOperatorState(false);updateFormOperationalButtons();if(isAdmin())loadSettings();tab('dashboardView');
 }
@@ -99,5 +102,3 @@ async function doLogout(){
   msg('Sesión cerrada.','ok');
 }
 $('logoutTop').onclick=doLogout;
-
-

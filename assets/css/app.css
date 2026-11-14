@@ -720,3 +720,20 @@ body:has(#auth[hidden])>main{padding:18px!important;background:transparent!impor
 .truck-camera-slot:active{transform:scale(.985);border-color:#087a4c;background:#effaf4}
 .truck-camera-slot img{width:100%;height:112px;object-fit:cover;border-radius:8px}
 @media(max-width:760px){.truck-camera-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.truck-camera-slot{min-height:160px;padding:8px}.truck-reference-art{height:96px;min-height:96px}.truck-camera-slot img{height:96px}}
+
+/* Firmas digitales y visualización completa de evidencia del Hino AT8811 */
+.truck-photo-grid a{display:flex;align-items:center;justify-content:center;min-width:0;min-height:145px;padding:5px;background:#f3f6f8;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.truck-photo-grid img{width:100%;height:145px;object-fit:contain!important;background:#f3f6f8;border:0!important;border-radius:5px}
+.truck-camera-slot img{object-fit:contain!important;background:#f3f6f8}
+.truck-condition-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 14px}
+.truck-condition-grid>div{display:flex;justify-content:space-between;gap:10px;padding:9px 11px;background:#fff;border:1px solid var(--line);border-radius:8px}
+.truck-condition-grid strong{color:var(--navy)}
+.truck-signature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:12px 0}
+.truck-signature-card{min-width:0;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.truck-signature-card label{display:block;font-weight:800;color:var(--navy);margin-bottom:4px}
+.truck-signature-card p{font-size:12px;color:var(--muted);margin:0 0 8px}
+.truck-signature-card canvas{display:block;width:100%;height:130px;touch-action:none;border:1px dashed #9aabba;border-radius:8px;background:linear-gradient(#fff,#fff) padding-box, repeating-linear-gradient(0deg,transparent 0 31px,#e8edf2 32px 33px);cursor:crosshair}
+.truck-signature-card .hint{min-height:18px;margin:6px 0}
+.truck-signature-view{display:flex;flex-direction:column;gap:6px;min-width:0;padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff;text-align:center}
+.truck-signature-view img{width:100%;height:100px;object-fit:contain;background:#fff}
+@media(max-width:600px){.truck-photo-grid a{min-height:125px}.truck-photo-grid img{height:125px}.truck-signature-grid,.truck-condition-grid{grid-template-columns:1fr}.truck-signature-card canvas{height:115px}}

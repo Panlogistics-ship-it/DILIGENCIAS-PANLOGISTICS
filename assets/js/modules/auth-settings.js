@@ -54,7 +54,7 @@ function resetForm(){
   clearClientSignature();
   $('entryId').value='';editing=null;activeFormDiligenceId=null;$('date').value=today();
   updateFormOperationalButtons();
-  $('departamento').value='Mensajería';$('cargo').value='Mensajero';$('sobre').value='0';$('viatico').value='0';
+  $('departamento').value='Mensajería';$('cargo').value='Mensajero';$('sobre').value='0';$('viatico').value='0';$('supervisor').value='Richard Albornoz';
   $('formTitle').textContent='Nueva diligencia';
   if($('entryEvaluator')) $('entryEvaluator').value=$('entryEvaluator').value||'';
   if($('entryCollaborator')){ $('entryCollaborator').value=isOperator()?user?.id||'':$('entryCollaborator').value; $('colaborador').value=profiles.find(p=>String(p.id)===String($('entryCollaborator').value))?.full_name||''; }

@@ -8,7 +8,7 @@ function collectDiligenceRow(existing=null){
     evaluador_id:$('entryEvaluator')?.value||'',
     departamento:$('departamento').value.trim(),cargo:$('cargo').value.trim(),
     destino:$('destino').value.trim(),motivo:$('motivo').value,
-    salida:existing?.salida||'',regreso:existing?.regreso||'',hours:Number(existing?.hours||0),
+    salida:existing?.salida||new Intl.DateTimeFormat('en-GB',{timeZone:'America/Panama',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date()),regreso:existing?.regreso||'',hours:Number(existing?.hours||0),
     sobre:Number($('sobre').value)||0,viatico:Number($('viatico').value)||0,
     codigo:$('codigo').value.trim(),supervisor:$('supervisor').value.trim(),
     obs:$('obs').value.trim(),aprob:existing?.aprob||'Pendiente',created_by:existing?.created_by||user.id
